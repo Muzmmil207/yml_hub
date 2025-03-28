@@ -14,6 +14,19 @@ def handle_user_creation(sender, instance: CustomUser, created, **kwargs):
         # If role is instructor, make them staff
         if instance.role == CustomUser.Role.INSTRUCTOR:
             instance.is_staff = True
+
+            # Assign permissions to the instructor
+            permissions = Permission.objects.filter(
+                content_type__model__in=[
+                    "course",
+                    "lesson",
+                    "enrollment",
+                    "quiz",
+                    "assignment",
+                ]
+            )
+            instance.user_permissions.set(permissions)
+
             instance.save()
 
         # Send Welcome Email
