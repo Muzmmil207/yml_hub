@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib import admin
 
-from .models import Assignment, Course, Enrollment, Lesson, Quiz
+from quizzes.models import Quiz
+
+from .models import Assignment, Course, Enrollment, Lesson
 
 
 # Custom form to exclude instructor from visible fields
@@ -98,10 +100,6 @@ class EnrollmentAdmin(admin.ModelAdmin):
         return False
 
 
-class QuizAdmin(admin.ModelAdmin):
-    list_display = ["title", "lesson", "max_score"]
-
-
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ["title", "lesson", "due_date", "max_score"]
 
@@ -110,5 +108,4 @@ class AssignmentAdmin(admin.ModelAdmin):
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
 admin.site.register(Lesson, LessonAdmin)
-admin.site.register(Quiz, QuizAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
