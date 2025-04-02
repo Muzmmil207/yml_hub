@@ -93,7 +93,7 @@
                         <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="ar">العربية</a>
                     </div>
                 </div>
-                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out" data-i18n="login">Login</button>
+                <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out" data-i18n="login">Login</a>
             </div>
         </div>
     </header>
@@ -105,7 +105,7 @@
                 <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" data-i18n="hero.title">Welcome to our platform</h2>
                 <p class="text-gray-600 text-lg mb-8" data-i18n="hero.subtitle">Empowering young minds with interactive learning experiences designed for the future.</p>
                 <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md font-medium transition duration-300 ease-in-out" data-i18n="hero.getStarted">Get Started</button>
+                    <a href="{% url 'login' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md font-medium transition duration-300 ease-in-out" data-i18n="hero.getStarted">Get Started</a>
                     <button class="border border-blue-500 text-blue-500 hover:bg-blue-50 px-6 py-3 rounded-md font-medium transition duration-300 ease-in-out" data-i18n="hero.learnMore">Learn More</button>
                 </div>
             </div>
