@@ -1,6 +1,6 @@
-from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
 
 from courses.models import Lesson
 
@@ -40,7 +40,7 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
-    text = RichTextField()
+    text = CKEditor5Field()
     question_type = models.CharField(
         max_length=10,
         choices=[("MCQ", "Multiple Choice"), ("TEXT", "Text Input")],

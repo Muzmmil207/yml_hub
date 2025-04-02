@@ -1,0 +1,551 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Young Minds Learners Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/i18next/i18next.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: color 0.3s;
+        }
+        
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        
+        .ltr {
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .feature-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .hero-image {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blue: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="{% static 'images/logo.png' %}" alt="YML Hub Logo" class="h-10 w-auto">
+                <h1 class="ml-3 text-xl font-bold text-gray-800" data-i18n="brand">Young Minds Learners Hub</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button id="language-toggle" class="flex items-center space-x-1 p-2 rounded-md hover:bg-gray-200 focus:outline-none">
+                        <span id="current-lang" data-i18n="language">English</span>
+                        <i data-feather="globe" class="h-4 w-4"></i>
+                    </button>
+                    <div id="language-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="en">English</a>
+                        <a href="#" class="lang-option block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang="ar">العربية</a>
+                    </div>
+                </div>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out" data-i18n="login">Login</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight" data-i18n="hero.title">Welcome to our platform</h2>
+                <p class="text-gray-600 text-lg mb-8" data-i18n="hero.subtitle">Empowering young minds with interactive learning experiences designed for the future.</p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md font-medium transition duration-300 ease-in-out" data-i18n="hero.getStarted">Get Started</button>
+                    <button class="border border-blue-500 text-blue-500 hover:bg-blue-50 px-6 py-3 rounded-md font-medium transition duration-300 ease-in-out" data-i18n="hero.learnMore">Learn More</button>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <img src="{% static 'images/istockphoto-1399506394-612x612.jpg' %}" alt="Learning Illustration" class="hero-image max-w-full h-auto rounded-lg shadow-xl">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-i18n="features.title">Platform Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="book-open" class="text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3" data-i18n="features.courses.title">Interactive Courses</h3>
+                    <p class="text-gray-600" data-i18n="features.courses.description">Engage with dynamic content designed to make learning fun and effective for young minds.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="award" class="text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3" data-i18n="features.progress.title">Progress Tracking</h3>
+                    <p class="text-gray-600" data-i18n="features.progress.description">Monitor learning achievements and growth with detailed progress reports and analytics.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="users" class="text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3" data-i18n="features.community.title">Parent Involvement</h3>
+                    <p class="text-gray-600" data-i18n="features.community.description">Parents can monitor progress, communicate with instructors, and support their child's learning journey.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="code" class="text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3" data-i18n="features.coding.title">Coding Challenges</h3>
+                    <p class="text-gray-600" data-i18n="features.coding.description">Learn programming concepts through fun, interactive challenges designed for young learners.</p>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="check-circle" class="text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3" data-i18n="features.quizzes.title">Interactive Quizzes</h3>
+                    <p class="text-gray-600" data-i18n="features.quizzes.description">Test knowledge and reinforce learning with engaging quizzes and immediate feedback.</p>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-feather="globe" class="text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3" data-i18n="features.language.title">Multilingual Support</h3>
+                    <p class="text-gray-600" data-i18n="features.language.description">Learn in your preferred language with full support for both Arabic and English.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12" data-i18n="testimonials.title">What Our Users Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'images/testimonials/user-35.jpg' %}" alt="User" class="w-12 h-12 rounded-full">
+                        <div class="ml-4">
+                            <h4 class="font-semibold" data-i18n="testimonials.user1.name">Ahmed Hassan</h4>
+                            <p class="text-gray-600 text-sm" data-i18n="testimonials.user1.role">Parent</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600" data-i18n="testimonials.user1.quote">My child has shown remarkable improvement in problem-solving skills since joining YML Hub. The interactive approach makes learning enjoyable.</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'images/testimonials/user-36.jpg' %}" alt="User" class="w-12 h-12 rounded-full">
+                        <div class="ml-4">
+                            <h4 class="font-semibold" data-i18n="testimonials.user2.name">Fatima Ali</h4>
+                            <p class="text-gray-600 text-sm" data-i18n="testimonials.user2.role">Instructor</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600" data-i18n="testimonials.user2.quote">The platform provides excellent tools for tracking student progress and customizing learning paths. It's transformed how I teach.</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'images/testimonials/user-37.jpg' %}" alt="User" class="w-12 h-12 rounded-full">
+                        <div class="ml-4">
+                            <h4 class="font-semibold" data-i18n="testimonials.user3.name">Yousef Mahmoud</h4>
+                            <p class="text-gray-600 text-sm" data-i18n="testimonials.user3.role">Student</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600" data-i18n="testimonials.user3.quote">I love the coding challenges! They make learning programming fun and I can track my progress easily.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-blue-500 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6" data-i18n="cta.title">Ready to Start Learning?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto" data-i18n="cta.subtitle">Join thousands of students on their journey to mastering new skills in a fun and interactive way.</p>
+            <button class="bg-white text-blue-500 hover:bg-gray-100 px-8 py-3 rounded-md font-medium text-lg transition duration-300 ease-in-out" data-i18n="cta.button">Sign Up Now</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-i18n="footer.about.title">About YML Hub</h3>
+                    <p class="text-gray-400" data-i18n="footer.about.description">Young Minds Learners Hub is an innovative e-learning platform designed to empower young learners with interactive educational experiences.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-i18n="footer.links.title">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300" data-i18n="footer.links.home">Home</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300" data-i18n="footer.links.courses">Courses</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300" data-i18n="footer.links.about">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300" data-i18n="footer.links.contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-i18n="footer.contact.title">Contact Us</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i data-feather="mail" class="h-4 w-4 mr-2"></i>
+                            <span>info@ymlhub.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="phone" class="h-4 w-4 mr-2"></i>
+                            <span>+966 12 345 6789</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="map-pin" class="h-4 w-4 mr-2"></i>
+                            <span data-i18n="footer.contact.address">Riyadh, Saudi Arabia</span>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-i18n="footer.subscribe.title">Subscribe</h3>
+                    <p class="text-gray-400 mb-4" data-i18n="footer.subscribe.description">Stay updated with our latest news and updates.</p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l-md focus:outline-none text-gray-800" data-i18n-placeholder="footer.subscribe.placeholder">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-r-md transition duration-300 ease-in-out" data-i18n="footer.subscribe.button">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400" data-i18n="footer.copyright">© 2024 Young Minds Learners Hub. All rights reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="facebook"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i data-feather="linkedin"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Feather Icons
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            const langOptions = document.querySelectorAll('.lang-option');
+            const currentLang = document.getElementById('current-lang');
+            const htmlElement = document.documentElement;
+
+            // Initialize i18next
+            i18next.init({
+                lng: 'en',
+                debug: false,
+                resources: {
+                    en: {
+                        translation: {
+                            brand: "Young Minds Learners Hub",
+                            language: "English",
+                            login: "Login",
+                            hero: {
+                                title: "Welcome to our platform",
+                                subtitle: "Empowering young minds with interactive learning experiences designed for the future.",
+                                getStarted: "Get Started",
+                                learnMore: "Learn More"
+                            },
+                            features: {
+                                title: "Platform Features",
+                                courses: {
+                                    title: "Interactive Courses",
+                                    description: "Engage with dynamic content designed to make learning fun and effective for young minds."
+                                },
+                                progress: {
+                                    title: "Progress Tracking",
+                                    description: "Monitor learning achievements and growth with detailed progress reports and analytics."
+                                },
+                                community: {
+                                    title: "Parent Involvement",
+                                    description: "Parents can monitor progress, communicate with instructors, and support their child's learning journey."
+                                },
+                                coding: {
+                                    title: "Coding Challenges",
+                                    description: "Learn programming concepts through fun, interactive challenges designed for young learners."
+                                },
+                                quizzes: {
+                                    title: "Interactive Quizzes",
+                                    description: "Test knowledge and reinforce learning with engaging quizzes and immediate feedback."
+                                },
+                                language: {
+                                    title: "Multilingual Support",
+                                    description: "Learn in your preferred language with full support for both Arabic and English."
+                                }
+                            },
+                            testimonials: {
+                                title: "What Our Users Say",
+                                user1: {
+                                    name: "Ahmed Hassan",
+                                    role: "Parent",
+                                    quote: "My child has shown remarkable improvement in problem-solving skills since joining YML Hub. The interactive approach makes learning enjoyable."
+                                },
+                                user2: {
+                                    name: "Fatima Ali",
+                                    role: "Instructor",
+                                    quote: "The platform provides excellent tools for tracking student progress and customizing learning paths. It's transformed how I teach."
+                                },
+                                user3: {
+                                    name: "Yousef Mahmoud",
+                                    role: "Student",
+                                    quote: "I love the coding challenges! They make learning programming fun and I can track my progress easily."
+                                }
+                            },
+                            cta: {
+                                title: "Ready to Start Learning?",
+                                subtitle: "Join thousands of students on their journey to mastering new skills in a fun and interactive way.",
+                                button: "Sign Up Now"
+                            },
+                            footer: {
+                                about: {
+                                    title: "About YML Hub",
+                                    description: "Young Minds Learners Hub is an innovative e-learning platform designed to empower young learners with interactive educational experiences."
+                                },
+                                links: {
+                                    title: "Quick Links",
+                                    home: "Home",
+                                    courses: "Courses",
+                                    about: "About Us",
+                                    contact: "Contact"
+                                },
+                                contact: {
+                                    title: "Contact Us",
+                                    address: "Riyadh, Saudi Arabia"
+                                },
+                                subscribe: {
+                                    title: "Subscribe",
+                                    description: "Stay updated with our latest news and updates.",
+                                    placeholder: "Your email",
+                                    button: "Subscribe"
+                                },
+                                copyright: "© 2024 Young Minds Learners Hub. All rights reserved."
+                            }
+                        }
+                    },
+                    ar: {
+                        translation: {
+                            brand: "مركز تعلم العقول الشابة",
+                            language: "العربية",
+                            login: "تسجيل الدخول",
+                            hero: {
+                                title: "مرحبًا بكم في منصتنا",
+                                subtitle: "تمكين العقول الشابة من خلال تجارب تعليمية تفاعلية مصممة للمستقبل.",
+                                getStarted: "ابدأ الآن",
+                                learnMore: "اعرف المزيد"
+                            },
+                            features: {
+                                title: "ميزات المنصة",
+                                courses: {
+                                    title: "دورات تفاعلية",
+                                    description: "تفاعل مع محتوى ديناميكي مصمم لجعل التعلم ممتعًا وفعالًا للعقول الشابة."
+                                },
+                                progress: {
+                                    title: "تتبع التقدم",
+                                    description: "مراقبة الإنجازات التعليمية والنمو من خلال تقارير تقدم مفصلة وتحليلات."
+                                },
+                                community: {
+                                    title: "مشاركة الوالدين",
+                                    description: "يمكن للوالدين مراقبة التقدم والتواصل مع المدربين ودعم رحلة تعلم أطفالهم."
+                                },
+                                coding: {
+                                    title: "تحديات البرمجة",
+                                    description: "تعلم مفاهيم البرمجة من خلال تحديات ممتعة وتفاعلية مصممة للمتعلمين الصغار."
+                                },
+                                quizzes: {
+                                    title: "اختبارات تفاعلية",
+                                    description: "اختبر المعرفة وعزز التعلم من خلال الاختبارات التفاعلية والتغذية الراجعة الفورية."
+                                },
+                                language: {
+                                    title: "دعم متعدد اللغات",
+                                    description: "تعلم بلغتك المفضلة مع دعم كامل للغتين العربية والإنجليزية."
+                                }
+                            },
+                            testimonials: {
+                                title: "ماذا يقول مستخدمونا",
+                                user1: {
+                                    name: "أحمد حسن",
+                                    role: "ولي أمر",
+                                    quote: "أظهر طفلي تحسنًا ملحوظًا في مهارات حل المشكلات منذ انضمامه إلى مركز تعلم العقول الشابة. النهج التفاعلي يجعل التعلم ممتعًا."
+                                },
+                                user2: {
+                                    name: "فاطمة علي",
+                                    role: "مدرّسة",
+                                    quote: "توفر المنصة أدوات ممتازة لتتبع تقدم الطلاب وتخصيص مسارات التعلم. لقد غيرت طريقة تدريسي."
+                                },
+                                user3: {
+                                    name: "يوسف محمود",
+                                    role: "طالب",
+                                    quote: "أحب تحديات البرمجة! إنها تجعل تعلم البرمجة ممتعًا ويمكنني تتبع تقدمي بسهولة."
+                                }
+                            },
+                            cta: {
+                                title: "هل أنت مستعد لبدء التعلم؟",
+                                subtitle: "انضم إلى آلاف الطلاب في رحلتهم لإتقان مهارات جديدة بطريقة ممتعة وتفاعلية.",
+                                button: "سجل الآن"
+                            },
+                            footer: {
+                                about: {
+                                    title: "عن مركز تعلم العقول الشابة",
+                                    description: "مركز تعلم العقول الشابة هو منصة تعليمية إلكترونية مبتكرة مصممة لتمكين المتعلمين الصغار من خلال تجارب تعليمية تفاعلية."
+                                },
+                                links: {
+                                    title: "روابط سريعة",
+                                    home: "الرئيسية",
+                                    courses: "الدورات",
+                                    about: "من نحن",
+                                    contact: "اتصل بنا"
+                                },
+                                contact: {
+                                    title: "اتصل بنا",
+                                    address: "الرياض، المملكة العربية السعودية"
+                                },
+                                subscribe: {
+                                    title: "اشترك",
+                                    description: "ابق على اطلاع بأحدث أخبارنا وتحديثاتنا.",
+                                    placeholder: "بريدك الإلكتروني",
+                                    button: "اشترك"
+                                },
+                                copyright: "© 2024 مركز تعلم العقول الشابة. جميع الحقوق محفوظة."
+                            }
+                        }
+                    }
+                }
+            }, function(err, t) {
+                updateContent();
+            });
+            
+            // Language Dropdown Toggle
+            const langToggle = document.getElementById('language-toggle');
+            const langDropdown = document.getElementById('language-dropdown');
+            
+            langToggle.addEventListener('click', function() {
+                langDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!langToggle.contains(event.target) && !langDropdown.contains(event.target)) {
+                    langDropdown.classList.add('hidden');
+                }
+            });
+            
+ 
+            
+            // Language Selection
+            langOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    i18next.changeLanguage(lang, function() {
+                        updateContent();
+                        langDropdown.classList.add('hidden');
+                        
+                        // Update direction based on language
+                        if (lang === 'ar') {
+                            htmlElement.setAttribute('dir', 'rtl');
+                            document.body.classList.add('rtl');
+                            document.body.classList.remove('ltr');
+                        } else {
+                            htmlElement.setAttribute('dir', 'ltr');
+                            document.body.classList.add('ltr');
+                            document.body.classList.remove('rtl');
+                        }
+                    });
+                });
+            });
+            
+            // Update content with translations
+            function updateContent() {
+                const elements = document.querySelectorAll('[data-i18n]');
+                elements.forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    element.textContent = i18next.t(key);
+                });
+                
+                // Update placeholder for email input
+                const emailInput = document.querySelector('input[type="email"]');
+                if (emailInput) {
+                    const placeholderKey = emailInput.getAttribute('data-i18n-placeholder');
+                    if (placeholderKey) {
+                        emailInput.placeholder = i18next.t(placeholderKey);
+                    }
+                }
+                
+                // Update current language display
+                currentLang.textContent = i18next.t('language');
+            }
+        });
+    </script>
+</body>
+</html>

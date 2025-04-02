@@ -1,6 +1,6 @@
-from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
 
 LANGUAGE_CHOICES = [
     ("en", "English"),
@@ -104,10 +104,10 @@ class Lesson(models.Model):
         help_text="Enter the lesson title (max 255 characters).",
         verbose_name="Lesson Title",
     )
-    content = RichTextField(
+    content = CKEditor5Field(
         help_text="Provide the lesson content. You can use formatted text if supported.",
         verbose_name="Lesson Content",
-    )  # Consider using a RichTextField if available
+    )  # Consider using a CKEditor5Field if available
     video_url = models.URLField(
         blank=True, null=True, help_text="Link to a lesson video (if available)."
     )
@@ -149,7 +149,7 @@ class Assignment(models.Model):
         help_text="Enter the assignment title (max 255 characters).",
         verbose_name="Assignment Title",
     )
-    instructions = RichTextField(
+    instructions = CKEditor5Field(
         help_text="Provide detailed instructions for completing the assignment.",
         verbose_name="Assignment Instructions",
     )
