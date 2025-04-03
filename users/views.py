@@ -5,11 +5,6 @@ from django.shortcuts import redirect, render
 from .forms import LoginForm
 
 
-def dashboard_view(request: HttpRequest):
-
-    return render(request, "users/dashboard.html")
-
-
 def login_view(request: HttpRequest):
     if request.user.is_authenticated:
         return redirect("dashboard")

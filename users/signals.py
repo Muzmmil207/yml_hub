@@ -5,12 +5,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
 
-from .models import CustomUser
+from .models import CustomUser, UserProfile
 
 
 @receiver(post_save, sender=CustomUser)
 def handle_user_creation(sender, instance: CustomUser, created, **kwargs):
     if created:
+        UserProfile.objects.create(user=instance)
+
         # If role is instructor, make them staff
         if instance.role == CustomUser.Role.INSTRUCTOR:
             instance.is_staff = True

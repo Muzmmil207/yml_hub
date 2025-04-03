@@ -1,4 +1,3 @@
-# users/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -32,3 +31,18 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.role})"
 
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    avatar = models.ImageField(
+        upload_to="avatars/%y/%m/%d",
+        default="images/default-avatar.jpg",
+        null=True,
+        blank=True,
+    )
+
+    @property
+    def avatar_url(self):
+        if self.avatar:  # If an avatar is uploaded
+            return self.avatar.url
+        return "/images/default-avatar.jpg"
