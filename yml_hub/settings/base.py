@@ -41,9 +41,7 @@ LOCAL_APPS = [
     "courses",
     "quizzes",
 ]
-THIRD_PARTY_APPS = [
-    "django_ckeditor_5",
-]
+THIRD_PARTY_APPS = ["django_ckeditor_5", "rest_framework"]
 INSTALLED_APPS = DJANGO_COMMON_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [

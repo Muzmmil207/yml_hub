@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Avg, Count
 from django_ckeditor_5.fields import CKEditor5Field
 
 LANGUAGE_CHOICES = [
@@ -8,7 +9,30 @@ LANGUAGE_CHOICES = [
 ]
 
 
+class CourseCategory(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Course(models.Model):
+    DURATION_CHOICES = [
+        ("1_day", "1 Day"),
+        ("3_days", "3 Days"),
+        ("1_week", "1 Week"),
+        ("2_weeks", "2 Weeks"),
+        ("4_weeks", "4 Weeks"),
+        ("8_weeks", "8 Weeks"),
+        ("12_weeks", "12 Weeks"),
+    ]
+
+    LEVEL_CHOICES = [
+        ("beginner", "Beginner"),
+        ("intermediate", "Intermediate"),
+        ("advanced", "Advanced"),
+    ]
+
     title = models.CharField(
         max_length=255,
         help_text="Enter the course title (max 255 characters).",
@@ -21,6 +45,13 @@ class Course(models.Model):
         limit_choices_to={"role__in": ["admin", "instructor"]},
         help_text="Select the instructor for this course. Only admins and instructors are allowed.",
         verbose_name="Instructor",
+    )
+    category = models.ForeignKey(
+        CourseCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="Select the category this course belongs to (e.g., JavaScript, React, Python, Flutter, Node, Unity).",
+        verbose_name="Course Category",
     )
     language = models.CharField(
         max_length=50,
@@ -43,9 +74,55 @@ class Course(models.Model):
         null=True,
         help_text="Upload a thumbnail image for the course.",
     )
+    duration = models.CharField(
+        max_length=10,
+        choices=DURATION_CHOICES,
+        help_text="Select the total duration of the course (e.g., 1 Day, 1 Week, 4 Weeks).",
+        verbose_name="Course Duration",
+    )
+    level = models.CharField(
+        max_length=15,
+        choices=LEVEL_CHOICES,
+        default="beginner",
+        help_text="Select the difficulty level of the course.",
+        verbose_name="Course Level",
+    )
+    learning_points = models.TextField(
+        help_text="Enter key learning points separated by semicolons (;). Example: Learn Python basics; Understand OOP; Work with Django",
+        verbose_name="Learning Points",
+    )
 
     def __str__(self):
         return self.title
+
+    @property
+    def thumbnail_url(self):
+        if self.thumbnail:  # If an thumbnail is uploaded
+            return self.thumbnail.url
+        return "/images/default-thumbnail.jpg"
+
+    @property
+    def rating(self):
+        """Returns the average rating of the course."""
+        return self.reviews.aggregate(avg_rating=Avg("rating"))["avg_rating"] or 0
+
+    @property
+    def review_count(self):
+        """Returns the total number of reviews for the course."""
+        return self.reviews.aggregate(count=Count("id"))["count"]
+
+
+class CourseReview(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(
+        choices=[(i, f"{i} Stars") for i in range(1, 6)]
+    )
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.user.username} - {self.rating} Stars"
 
 
 class Enrollment(models.Model):
@@ -85,6 +162,16 @@ class Enrollment(models.Model):
 
 
 class Lesson(models.Model):
+    DURATION_CHOICES = [
+        ("5_min", "5 Minutes"),
+        ("10_min", "10 Minutes"),
+        ("15_min", "15 Minutes"),
+        ("30_min", "30 Minutes"),
+        ("45_min", "45 Minutes"),
+        ("1_hour", "1 Hour"),
+        ("1.5_hours", "1.5 Hours"),
+        ("2_hours", "2 Hours"),
+    ]
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
@@ -125,6 +212,12 @@ class Lesson(models.Model):
         auto_now_add=True,
         help_text="The date and time when the lesson was created.",
         verbose_name="Created At",
+    )
+    duration = models.CharField(
+        max_length=10,
+        choices=DURATION_CHOICES,
+        help_text="Select the estimated duration of the lesson (e.g., 10 Minutes, 30 Minutes, 1 Hour).",
+        verbose_name="Lesson Duration",
     )
 
     class Meta:

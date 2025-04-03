@@ -3,7 +3,7 @@ from django.contrib import admin
 
 from quizzes.models import Quiz
 
-from .models import Assignment, Course, Enrollment, Lesson
+from .models import Assignment, Course, CourseReview, Enrollment, Lesson
 
 
 # Custom form to exclude instructor from visible fields
@@ -104,8 +104,26 @@ class AssignmentAdmin(admin.ModelAdmin):
     list_display = ["title", "lesson", "due_date", "max_score"]
 
 
+from django.contrib import admin
+
+from .models import CourseCategory
+
+
+@admin.register(CourseCategory)
+class CourseCategoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+    search_fields = ("name",)
+
+
+class CourseReviewAdmin(admin.ModelAdmin):
+    list_display = ("id", "course", "user", "rating", "created_at")
+    search_fields = ("course__name", "user__username")
+    list_filter = ("rating", "created_at")
+
+
 # Register models
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Enrollment, EnrollmentAdmin)
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
+admin.site.register(CourseReview, CourseReviewAdmin)
