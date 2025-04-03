@@ -21,7 +21,6 @@ def get_courses(request):
             "description": course.description,
             "instructor": {
                 "name": instructor.get_full_name() or instructor.username,
-                "title": instructor.title if hasattr(instructor, 'title') else "Instructor",
                 "image": instructor.userprofile.avatar_url
             },
             "image": course.thumbnail_url,

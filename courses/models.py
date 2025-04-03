@@ -179,13 +179,13 @@ class Lesson(models.Model):
         help_text="Select the course this lesson belongs to.",
         verbose_name="Course",
     )
-    instructor = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        limit_choices_to={"role__in": ["admin", "instructor"]},
-        help_text="Choose the instructor responsible for this lesson.",
-        verbose_name="Instructor",
-    )
+    # instructor = models.ForeignKey(
+    #     settings.AUTH_USER_MODEL,
+    #     on_delete=models.CASCADE,
+    #     limit_choices_to={"role__in": ["admin", "instructor"]},
+    #     help_text="Choose the instructor responsible for this lesson.",
+    #     verbose_name="Instructor",
+    # )
     title = models.CharField(
         max_length=255,
         help_text="Enter the lesson title (max 255 characters).",

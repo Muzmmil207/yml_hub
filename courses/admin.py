@@ -3,18 +3,29 @@ from django.contrib import admin
 
 from quizzes.models import Quiz
 
-from .models import Assignment, Course, CourseReview, Enrollment, Lesson
+from .models import Assignment, Course, CourseCategory, CourseReview, Enrollment, Lesson
 
 
 # Custom form to exclude instructor from visible fields
 class CourseAdminForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ["title", "description", "language"]
+        fields = [
+            "title",
+            "description",
+            "language",
+            "instructor",
+            "category",
+            "status",
+            "thumbnail",
+            "duration",
+            "level",
+            "learning_points",
+        ]
 
     def save(self, commit=True):
         course = super().save(commit=False)
-        if not course.instructor_id:
+        if not hasattr(course, "instructor"):
             course.instructor = self.request.user
         if commit:
             course.save()
@@ -102,11 +113,6 @@ class EnrollmentAdmin(admin.ModelAdmin):
 
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ["title", "lesson", "due_date", "max_score"]
-
-
-from django.contrib import admin
-
-from .models import CourseCategory
 
 
 @admin.register(CourseCategory)

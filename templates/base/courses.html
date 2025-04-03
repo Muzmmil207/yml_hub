@@ -377,188 +377,23 @@
 {% block extra_scripts %}
 <script>
     // Course data
-    const courseData = [
-        {
-            id: 1,
-            title: "JavaScript Fundamentals",
-            category: "JavaScript",
-            description: "Learn the core concepts of JavaScript with hands-on exercises and real-world projects. This comprehensive course covers everything from basic syntax to advanced concepts like closures, promises, and async/await.",
-            instructor: {
-                name: "Sarah Johnson",
-                title: "Senior JavaScript Developer",
-                image: "https://via.placeholder.com/60"
-            },
-            image: "https://via.placeholder.com/800x400?text=JavaScript+Fundamentals",
-            duration: "8 weeks",
-            level: "Beginner",
-            students: "1,456",
-            language: "English, Arabic",
-            rating: "4.2 (156)",
-            learningPoints: [
-                "Master JavaScript fundamentals and ES6+ features",
-                "Understand asynchronous programming with Promises",
-                "Build interactive web applications",
-                "Debug and optimize JavaScript code"
-            ],
-            lessons: [
-                { title: "Introduction to JavaScript", duration: "45 min", locked: false },
-                { title: "Variables, Data Types, and Operators", duration: "1 hr", locked: false },
-                { title: "Functions and Scope", duration: "1.5 hrs", locked: true },
-                { title: "Arrays and Objects", duration: "2 hrs", locked: true }
-            ]
-        },
-        
-        {
-            id: 2,
-            title: "React Development",
-            category: "React",
-            description: "Master React.js and build modern, responsive web applications with the most popular JavaScript library. Learn component-based architecture, state management, hooks, and how to connect to APIs.",
-            instructor: {
-                name: "Michael Chen",
-                title: "React Specialist",
-                image: "https://via.placeholder.com/60"
-            },
-            image: "https://via.placeholder.com/800x400?text=React+Development",
-            duration: "10 weeks",
-            level: "Intermediate",
-            students: "2,103",
-            language: "English, Arabic",
-            rating: "4.9 (203)",
-            learningPoints: [
-                "Build single-page applications with React",
-                "Manage application state with Redux",
-                "Create reusable components and custom hooks",
-                "Implement routing and form validation"
-            ],
-            lessons: [
-                { title: "React Fundamentals", duration: "1 hr", locked: false },
-                { title: "Components and Props", duration: "1.5 hrs", locked: false },
-                { title: "State and Lifecycle", duration: "2 hrs", locked: true },
-                { title: "Hooks and Context API", duration: "2.5 hrs", locked: true }
-            ]
-        },
-        {
-            id: 3,
-            title: "Python for Data Science",
-            category: "Python",
-            description: "Learn Python programming and essential libraries for data analysis, visualization, and machine learning. This course covers NumPy, Pandas, Matplotlib, and an introduction to scikit-learn.",
-            instructor: {
-                name: "Emily Rodriguez",
-                title: "Data Scientist",
-                image: "https://via.placeholder.com/60"
-            },
-            image: "https://via.placeholder.com/800x400?text=Python+for+Data+Science",
-            duration: "12 weeks",
-            level: "Beginner to Intermediate",
-            students: "1,879",
-            language: "English, Arabic",
-            rating: "4.3 (178)",
-            learningPoints: [
-                "Master Python programming fundamentals",
-                "Analyze and visualize data with Pandas and Matplotlib",
-                "Build predictive models with scikit-learn",
-                "Work with real-world datasets and case studies"
-            ],
-            lessons: [
-                { title: "Python Basics", duration: "1 hr", locked: false },
-                { title: "Data Manipulation with NumPy and Pandas", duration: "2 hrs", locked: false },
-                { title: "Data Visualization", duration: "1.5 hrs", locked: true },
-                { title: "Introduction to Machine Learning", duration: "3 hrs", locked: true }
-            ]
-        },
-        {
-            id: 4,
-            title: "Flutter Mobile Development",
-            category: "Flutter",
-            description: "Build beautiful, natively compiled applications for mobile, web, and desktop from a single codebase. Learn Dart programming and Flutter framework to create cross-platform apps.",
-            instructor: {
-                name: "James Wilson",
-                title: "Mobile App Developer",
-                image: "https://via.placeholder.com/60"
-            },
-            image: "https://via.placeholder.com/800x400?text=Flutter+Mobile+Development",
-            duration: "10 weeks",
-            level: "Intermediate",
-            students: "1,345",
-            language: "English, Arabic",
-            rating: "4.5 (132)",
-            learningPoints: [
-                "Master Dart programming language",
-                "Build responsive UIs with Flutter widgets",
-                "Implement state management solutions",
-                "Deploy apps to iOS and Android platforms"
-            ],
-            lessons: [
-                { title: "Introduction to Dart", duration: "1 hr", locked: false },
-                { title: "Flutter Basics", duration: "1.5 hrs", locked: false },
-                { title: "Building UI with Widgets", duration: "2 hrs", locked: true },
-                { title: "State Management", duration: "2.5 hrs", locked: true }
-            ]
-        },
-        {
-            id: 5,
-            title: "Node.js Backend Development",
-            category: "Node.js",
-            description: "Learn server-side JavaScript and build scalable APIs and web applications with Node.js and Express. This course covers RESTful API design, authentication, and database integration.",
-            instructor: {
-                name: "Sophia Martinez",
-                title: "Backend Developer",
-                image: "https://via.placeholder.com/60"
-            },
-            image: "https://via.placeholder.com/800x400?text=Node.js+Backend+Development",
-            duration: "8 weeks",
-            level: "Intermediate",
-            students: "1,678",
-            language: "English, Arabic",
-            rating: "4.8 (167)",
-            learningPoints: [
-                "Build RESTful APIs with Node.js and Express",
-                "Implement authentication and authorization",
-                "Work with databases like MongoDB and PostgreSQL",
-                "Deploy Node.js applications to production"
-            ],
-            lessons: [
-                { title: "Node.js Fundamentals", duration: "1 hr", locked: false },
-                { title: "Express Framework", duration: "1.5 hrs", locked: false },
-                { title: "RESTful API Design", duration: "2 hrs", locked: true },
-                { title: "Authentication and Security", duration: "2.5 hrs", locked: true }
-            ]
-        },
-        {
-            id: 6,
-            title: "Unity Game Development",
-            category: "Unity",
-            description: "Create interactive 2D and 3D games using Unity, C#, and industry-standard game development techniques. Learn game physics, animations, and how to publish your games.",
-            instructor: {
-                name: "Alex Thompson",
-                title: "Game Developer",
-                image: "https://via.placeholder.com/60"
-            },
-            image: "https://via.placeholder.com/800x400?text=Unity+Game+Development",
-            duration: "14 weeks",
-            level: "Beginner to Advanced",
-            students: "1,234",
-            language: "English, Arabic",
-            rating: "4.4 (112)",
-            learningPoints: [
-                "Master C# programming for Unity",
-                "Implement game mechanics and physics",
-                "Create 2D and 3D game assets",
-                "Publish games to multiple platforms"
-            ],
-            lessons: [
-                { title: "Introduction to Unity", duration: "1 hr", locked: false },
-                { title: "C# Programming for Unity", duration: "2 hrs", locked: false },
-                { title: "Game Physics and Mechanics", duration: "2.5 hrs", locked: true },
-                { title: "Animation and Visual Effects", duration: "3 hrs", locked: true }
-            ]
+    async function fetchCourseData() {
+        try {
+            const response = await fetch('/courses/get-courses'); // Replace with your API endpoint
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching course data:", error);
         }
-    ];
+    }
 
     // Initialize Feather Icons
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded',async function() {
         feather.replace();
-                    
+        const courseData = await  fetchCourseData()
+        console.log('courseData:',courseData)
         // Language Selection
         const langOptions = document.querySelectorAll('.lang-option');
         const currentLang = document.getElementById('current-lang');

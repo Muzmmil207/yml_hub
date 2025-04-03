@@ -174,3 +174,5 @@ cython_debug/
 .pypirc
 
 ignore
+media/course_thumbnails
+media/lesson_attachments
