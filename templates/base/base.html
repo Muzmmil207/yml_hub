@@ -145,10 +145,10 @@
                     
                     <!-- Global Search -->
                     <div class="hidden md:flex items-center flex-1 max-w-xl mx-4">
-                        <div class="relative w-full">
-                            <input type="text" placeholder="Search for courses..." class="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-i18n-placeholder="search.placeholder">
+                        <form action="{% url 'courses' %}" class="relative w-full">
+                            <input type="text" name="q" value="{{request.GET.q}}" placeholder="Search for courses..." class="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" data-i18n-placeholder="search.placeholder">
                             <i data-feather="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"></i>
-                        </div>
+                        </form>
                     </div>
                     
                     <!-- Right Navigation Items -->

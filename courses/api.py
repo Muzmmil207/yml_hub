@@ -14,6 +14,12 @@ def get_courses(request):
         instructor: CustomUser = course.instructor
         lessons: list[Lesson] = course.lessons.all()
 
+        learning_points = [
+            learning_point.strip()
+            for learning_point in course.learning_points.split(";")
+            if len(learning_point) > 1
+        ]
+
         course_data = {
             "id": course.id,
             "title": course.title,
@@ -29,7 +35,7 @@ def get_courses(request):
             "students": f"{course.enrollment_set.count()}",
             "language": course.language,
             "rating": f"{course.rating} ({course.review_count})" if hasattr(course, 'rating') else "No ratings",
-            "learningPoints": course.learning_points.split(";") if course.learning_points else [],
+            "learningPoints": learning_points,
             "lessons": [
                 {"title": lesson.title, "duration": lesson.get_duration_display(), "locked": True}
                 for lesson in lessons
