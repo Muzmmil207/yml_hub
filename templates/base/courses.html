@@ -220,7 +220,7 @@
         const currentLang = document.getElementById('current-lang');
         const htmlElement = document.documentElement;
         // Initialize i18next
-        i18next.init({
+        await i18next.init({
             lng: 'en',
             debug: false,
             resources: {

@@ -16,6 +16,16 @@ def dashboard_view(request: HttpRequest):
 
 
 @login_required
+def profile_view(request: HttpRequest):
+    user = request.user
+
+    context = {
+        "user": user,
+    }
+    return render(request, "base/profile.html", context)
+
+
+@login_required
 def courses_view(request: HttpRequest):
     courses = Course.objects.filter(status="Active")
     q = request.GET.get("q")

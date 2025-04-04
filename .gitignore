@@ -176,3 +176,4 @@ cython_debug/
 ignore
 media/course_thumbnails
 media/lesson_attachments
+media/avatars

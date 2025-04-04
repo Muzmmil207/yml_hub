@@ -1,0 +1,343 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+
+<!-- Loading Animation -->
+<div id="loading" class="loading">
+    <div class="spinner"></div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center">
+    <i data-feather="check-circle" class="h-5 w-5 mr-2"></i>
+    <span id="toast-message">Profile updated successfully!</span>
+</div>
+
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-4 md:p-6">
+    <div class="max-w-2xl mx-auto">
+        <!-- Simple Profile Card -->
+        <div class="profile-card bg-white rounded-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-32 relative">
+                <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2 profile-pic-container">
+                    <img src="{{user.userprofile.avatar_url}}" alt="{{user.username}}" class="profile-pic w-32 h-32 rounded-full object-cover">
+                    <label for="profile-upload" class="camera-button absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600 transition-colors">
+                        <i data-feather="camera" class="h-4 w-4"></i>
+                    </label>
+                    <input type="file" id="profile-upload" class="hidden" accept="image/*">
+                </div>
+            </div>
+            
+            <div class="p-6 pt-20">
+                <div class="flex flex-col items-center">
+                    <!-- User Information -->
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">@{{user.username}} - {{user.role}}</h2>
+                    <p class="text-gray-600 mb-2">{{user.email}}</p>
+                    <div class="flex items-center mb-6 text-sm text-gray-500">
+                        <i data-feather="calendar" class="h-4 w-4 mr-1 text-blue-500"></i>
+                        <span data-i18n="profile.memberSince">Member since: {{ user.date_joined|date:"F Y" }}</span>
+                    </div>
+                    
+                    <!-- Edit Profile Form -->
+                    <form id="profile-form" class="w-full max-w-md">
+                        <div class="mb-4 relative">
+                            <label for="username" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="profile.username">Username</label>
+                            <div class="relative">
+                                <i data-feather="user" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"></i>
+                                <input type="text" id="username" name="username" value="{{user.username}}" class="form-input w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6 relative">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="profile.email">Email</label>
+                            <div class="relative">
+                                <i data-feather="mail" class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"></i>
+                                <input type="email" id="email" name="email" value="{{user.email}}" class="form-input w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none">
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button type="submit" class="animated-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md flex items-center">
+                                <i data-feather="save" class="h-4 w-4 mr-2"></i>
+                                <span data-i18n="profile.saveChanges">Save Changes</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize Feather Icons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show loading animation
+        const loading = document.getElementById('loading');
+        
+        // Initialize Feather Icons
+        feather.replace();
+                    
+        // Language Selection
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLang = document.getElementById('current-lang');
+        const htmlElement = document.documentElement;
+        
+        // Initialize i18next
+        i18next.init({
+            lng: 'en',
+            debug: false,
+            resources: {
+                en: {
+                    translation: {
+                        brand: "YML Hub",
+                        language: "English",
+                        nav: {
+                            dashboard: "Dashboard",
+                            courses: "My Courses",
+                            quizzes: "Quizzes & Assignments",
+                            progress: "Progress Tracking",
+                            reviews: "Reviews & Feedback",
+                            student: "Student"
+                        },
+                        user: {
+                            profile: "Profile",
+                            settings: "Settings",
+                            logout: "Logout"
+                        },
+                        profile: {
+                            title: "User Profile",
+                            username: "Username",
+                            email: "Email",
+                            memberSince: "Member since: January 2023",
+                            saveChanges: "Save Changes",
+                            updateSuccess: "Profile updated successfully!"
+                        }
+                    }
+                },
+                ar: {
+                    translation: {
+                        brand: "مركز تعلم العقول الشابة",
+                        language: "العربية",
+                        nav: {
+                            dashboard: "لوحة التحكم",
+                            courses: "دوراتي",
+                            quizzes: "الاختبارات والواجبات",
+                            progress: "تتبع التقدم",
+                            reviews: "التقييمات والملاحظات",
+                            student: "طالب"
+                        },
+                        user: {
+                            profile: "الملف الشخصي",
+                            settings: "الإعدادات",
+                            logout: "تسجيل الخروج"
+                        },
+                        profile: {
+                            title: "الملف الشخصي",
+                            username: "اسم المستخدم",
+                            email: "البريد الإلكتروني",
+                            memberSince: "عضو منذ: يناير 2023",
+                            saveChanges: "حفظ التغييرات",
+                            updateSuccess: "تم تحديث الملف الشخصي بنجاح!"
+                        }
+                    }
+                }
+            }
+        }, function(err, t) {
+            updateContent();
+            
+            // Hide loading animation after content is loaded
+            setTimeout(function() {
+                loading.classList.add('hidden');
+            }, 800);
+        });
+        
+        // Sidebar toggle functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        
+        // Make these functions globally available
+        window.toggleSidebar = toggleSidebar;
+        window.closeSidebar = closeSidebar;
+        
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        menuToggle.addEventListener('click', toggleSidebar);
+        
+        // Language Dropdown Toggle
+        const langToggle = document.getElementById('language-toggle');
+        const langDropdown = document.getElementById('language-dropdown');
+        
+        langToggle.addEventListener('click', function() {
+            langDropdown.classList.toggle('hidden');
+        });
+        
+        // User Dropdown Toggle
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        userMenuButton.addEventListener('click', function() {
+            userDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!langToggle.contains(event.target) && !langDropdown.contains(event.target)) {
+                langDropdown.classList.add('hidden');
+            }
+            
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                i18next.changeLanguage(lang, function() {
+                    updateContent();
+                    langDropdown.classList.add('hidden');
+                    
+                    // Update direction based on language
+                    if (lang === 'ar') {
+                        htmlElement.setAttribute('dir', 'rtl');
+                        document.body.classList.add('rtl');
+                        document.body.classList.remove('ltr');
+                    } else {
+                        htmlElement.setAttribute('dir', 'ltr');
+                        document.body.classList.add('ltr');
+                        document.body.classList.remove('rtl');
+                    }
+                });
+            });
+        });
+        
+        // Add animation to form inputs
+        const formInputs = document.querySelectorAll('.form-input');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                const icon = input.parentElement.querySelector('i')
+                if (icon) {
+                    icon.classList.add('text-blue-500');
+                }
+            });
+            
+            input.addEventListener('blur', function() {
+                const icon = input.parentElement.querySelector('i')
+                if (icon) {
+                    icon.classList.remove('text-blue-500');
+                }
+            });
+        });
+        
+        // Profile form submission
+        const profileForm = document.getElementById('profile-form');
+        profileForm.addEventListener('submit',async function(e) {
+            e.preventDefault();
+            
+            // Add loading effect to button
+            const button = this.querySelector('button[type="submit"]');
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
+            
+     
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const response = await fetch('/accounts/api/update-profile/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Required for session-based POST
+                },
+                body: JSON.stringify({ username, email })
+            });
+
+            const data = await response.json();
+            button.disabled = false;
+            button.innerHTML = originalContent;
+            // Show toast notification
+            showToast(i18next.t('profile.updateSuccess'));
+        });
+        
+        // Profile picture upload
+        const profileUpload = document.getElementById('profile-upload');
+        profileUpload.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const formData = new FormData();
+                formData.append("avatar", this.files[0]);
+
+                fetch("{% url 'update_profile_picture' %}", {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"   
+                })
+                    .then(response => response.json())
+                    .catch(error => console.error("Error:", error));
+
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Update profile picture with animation
+                    const profilePics = document.querySelectorAll('img[alt="{{user.username}}"]');
+                    profilePics.forEach(pic => {
+                        pic.style.opacity = '0';
+                        setTimeout(function() {
+                            pic.src = e.target.result;
+                            pic.style.opacity = '1';
+                        }, 300);
+                    });
+                    
+                    // Show toast notification
+                    showToast(i18next.t('profile.updateSuccess'));
+                }
+                
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Update content with translations
+        function updateContent() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = i18next.t(key);
+            });
+            
+            // Update current language display
+            currentLang.textContent = i18next.t('language');
+        }
+    });
+</script>
+{% endblock %}
