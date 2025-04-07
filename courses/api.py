@@ -1,7 +1,9 @@
-from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404, redirect
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from courses.models import Course, Lesson
+from courses.models import Course, Enrollment, Lesson, LessonProgress
 from users.models import CustomUser
 
 
@@ -27,21 +29,54 @@ def get_courses(request):
             "description": course.description,
             "instructor": {
                 "name": instructor.get_full_name() or instructor.username,
-                "image": instructor.userprofile.avatar_url
+                "image": instructor.userprofile.avatar_url,
             },
             "image": course.thumbnail_url,
             "duration": course.get_duration_display() if course.duration else "N/A",
             "level": course.get_level_display(),
             "students": f"{course.enrollment_set.count()}",
             "language": course.language,
-            "rating": f"{course.rating} ({course.review_count})" if hasattr(course, 'rating') else "No ratings",
+            "rating": (
+                f"{course.rating} ({course.review_count})"
+                if hasattr(course, "rating")
+                else "No ratings"
+            ),
             "learningPoints": learning_points,
             "lessons": [
-                {"title": lesson.title, "duration": lesson.get_duration_display(), "locked": True}
+                {
+                    "title": lesson.title,
+                    "duration": lesson.get_duration_display(),
+                    "locked": True,
+                }
                 for lesson in lessons
-            ]
+            ],
         }
 
         data.append(course_data)
 
     return Response(data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def enroll_in_course(request, course_id):
+    user = request.user
+    course = get_object_or_404(Course, id=course_id)
+
+    enrollment, created = Enrollment.objects.get_or_create(student=user, course=course)
+
+    if not created:
+        # Already enrolled, get the last accessed lesson
+        progress = LessonProgress.objects.filter(
+            student=user, lesson__course=course
+        ).latest("id")
+        if progress:
+            return redirect(f"/{course.title}/lesson/{progress.lesson.id}/")
+
+    # New enrollment or no previous progress, redirect to first lesson
+    first_lesson = Lesson.objects.filter(course=course).earliest("created_at")
+    if first_lesson:
+        LessonProgress.objects.get_or_create(lesson=first_lesson, student=user)
+        return redirect(f"/{course.title}/lesson/{first_lesson.id}/")
+    else:
+        return Response({"detail": "No lessons found in this course."}, status=404)

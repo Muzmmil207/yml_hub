@@ -179,13 +179,6 @@ class Lesson(models.Model):
         help_text="Select the course this lesson belongs to.",
         verbose_name="Course",
     )
-    # instructor = models.ForeignKey(
-    #     settings.AUTH_USER_MODEL,
-    #     on_delete=models.CASCADE,
-    #     limit_choices_to={"role__in": ["admin", "instructor"]},
-    #     help_text="Choose the instructor responsible for this lesson.",
-    #     verbose_name="Instructor",
-    # )
     title = models.CharField(
         max_length=255,
         help_text="Enter the lesson title (max 255 characters).",
@@ -204,10 +197,6 @@ class Lesson(models.Model):
         null=True,
         help_text="Upload additional lesson materials.",
     )
-    order = models.PositiveIntegerField(
-        help_text="Define the lesson order within the course.",
-        verbose_name="Lesson Order",
-    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         help_text="The date and time when the lesson was created.",
@@ -221,13 +210,23 @@ class Lesson(models.Model):
     )
 
     class Meta:
-        ordering = ["order"]
+        ordering = ["created_at"]
         verbose_name = "Course Lesson"
         verbose_name_plural = "Course Lessons"
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
 
+class LessonProgress(models.Model):
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lesson_progress"
+    )
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.lesson.title} - {'Completed' if self.completed else 'In Progress'}"
 
 class Assignment(models.Model):
     lesson = models.ForeignKey(

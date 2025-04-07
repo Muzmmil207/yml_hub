@@ -26,6 +26,11 @@ def profile_view(request: HttpRequest):
 
 
 @login_required
+def lesson_view(request: HttpRequest, course_title, lesson_id):
+    return render(request, "base/lesson.html")
+
+
+@login_required
 def courses_view(request: HttpRequest):
     courses = Course.objects.filter(status="Active")
     q = request.GET.get("q")

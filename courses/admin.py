@@ -82,7 +82,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 ### Lesson Admin (With Quizzes and Assignments Inline)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ["title", "course", "order", "created_at"]
+    list_display = ["title", "course", "created_at"]
     exclude = ["instructor"]
     inlines = [QuizInline, AssignmentInline]  # Show Quiz & Assignment inside Lesson
 
