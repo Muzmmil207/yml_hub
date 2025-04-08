@@ -221,13 +221,16 @@ class Lesson(models.Model):
     def attachments_url(self):
         if self.attachments:  # If an attachments is uploaded
             return self.attachments.url
-    
+
     def __str__(self):
         return f"{self.course.title} - {self.title}"
 
+
 class LessonProgress(models.Model):
     student = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lesson_progress"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="lesson_progress",
     )
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
@@ -235,6 +238,7 @@ class LessonProgress(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.lesson.title} - {'Completed' if self.completed else 'In Progress'}"
+
 
 class Assignment(models.Model):
     lesson = models.OneToOneField(
@@ -274,3 +278,32 @@ class Assignment(models.Model):
     class Meta:
         verbose_name = "Assignment"
         verbose_name_plural = "Assignments"
+
+
+class AssignmentSubmission(models.Model):
+    assignment = models.ForeignKey(
+        Assignment, on_delete=models.CASCADE, related_name="submissions"
+    )
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="assignment_submissions",
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    attachment = models.FileField(
+        upload_to="assignment-submissions/", help_text="file upload for submission"
+    )
+    score = models.PositiveIntegerField(
+        blank=True, null=True, help_text="Score given by the teacher"
+    )
+    feedback = models.TextField(
+        blank=True, null=True, help_text="Optional feedback from teacher"
+    )
+    is_reviewed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("assignment", "student")
+        ordering = ["-submitted_at"]
+
+    def __str__(self):
+        return f"{self.student} - {self.assignment.title}"

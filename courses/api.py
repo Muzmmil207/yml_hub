@@ -1,10 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from courses.models import Course, Enrollment, Lesson, LessonProgress
 from users.models import CustomUser
+
+from .models import Assignment, AssignmentSubmission
+from .serializers import AssignmentSubmissionSerializer
 
 
 @api_view(["GET"])
@@ -96,3 +100,36 @@ def mark_lesson_as_complete(request, lesson_id):
         pass
 
     return Response({"detail": "No lessons found in this course."}, status=404)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def submit_assignment(request):
+    print("request.data:", request.data)
+    serializer = AssignmentSubmissionSerializer(data=request.data)
+    if serializer.is_valid():
+        assignment = serializer.validated_data["assignment"]
+        student = request.user
+
+        # Prevent duplicate submission
+        if AssignmentSubmission.objects.filter(
+            assignment=assignment, student=student
+        ).exists():
+            return Response(
+                {"message": "You have already submitted this assignment."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        AssignmentSubmission.objects.create(
+            assignment=assignment,
+            student=student,
+            attachment=serializer.validated_data.get("attachment"),
+        )
+        return Response(
+            {
+                "message": "Assignment submitted successfully. You will be notified once it's reviewed."
+            },
+            status=status.HTTP_201_CREATED,
+        )
+    print(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

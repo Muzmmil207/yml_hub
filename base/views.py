@@ -3,7 +3,13 @@ from django.db.models import Q
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 
-from courses.models import Course, CourseCategory, Lesson, LessonProgress
+from courses.models import (
+    AssignmentSubmission,
+    Course,
+    CourseCategory,
+    Lesson,
+    LessonProgress,
+)
 
 
 def landing_page(request: HttpRequest):
@@ -32,11 +38,17 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
         lesson__id=lesson.id, student=request.user
     )
     course_lessons = Lesson.objects.filter(course=lesson.course)
+    assignment_submission = AssignmentSubmission.objects.filter(
+        assignment=lesson.assignment, student=request.user
+    )
+    if assignment_submission.exists():
+        assignment_submission = assignment_submission.first()
 
     context = {
         "lesson": lesson,
         "course_lessons": course_lessons,
         "lesson_progress": lesson_progress,
+        "assignment_submission": assignment_submission,
     }
     return render(request, "base/lesson.html", context)
 

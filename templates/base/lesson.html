@@ -95,18 +95,33 @@
                     </div>
                     
                     <div class="mt-6">
-                        <label for="assignment-submission" class="block text-sm font-medium text-gray-700 mb-2">Submit Your Assignment</label>
-                        <div class="flex items-center">
-                            <input type="file" id="assignment-submission" class="hidden">
-                            <label for="assignment-submission" class="cursor-pointer bg-white border border-gray-300 rounded-md py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
-                                <i data-feather="upload" class="h-4 w-4 inline mr-1"></i>
-                                Choose File
-                            </label>
-                            <span class="ml-3 text-sm text-gray-500">No file chosen</span>
-                        </div>
-                        <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out" onclick="showToast('Assignment submitted successfully!')">
-                            Submit Assignment
-                        </button>
+                        {% if assignment_submission %}
+                            {% if assignment_submission.is_reviewed %}
+                            <p>Your assignment has been reviewed. Score: {{assignment_submission.score}}.</p>
+                            <p>{{assignment_submission.feedback}}</p>
+                            {% else %}
+                            <div class="">
+                                Assignment submitted. Awaiting review.
+                            </div>
+                            {% endif %}
+                        {% else %}
+                        <form id="assignmentForm" enctype="multipart/form-data">
+                            <input type="hidden" name="assignment" value="{{lesson.assignment.id}}">
+                            <label for="assignment-submission" class="block text-sm font-medium text-gray-700 mb-2">Submit Your Assignment</label>
+                            <div class="flex items-center">
+                                <input type="file" id="assignment-submission" name="attachment" required class="hidden">
+                                <label for="assignment-submission" class="cursor-pointer bg-white border border-gray-300 rounded-md py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                                    <i data-feather="upload" class="h-4 w-4 inline mr-1"></i>
+                                    Choose File
+                                </label>
+                                <span class="ml-3 text-sm text-gray-500">No file chosen</span>
+                            </div>
+                            <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out" onclick="showToast('Assignment submitted successfully!')">
+                                Submit Assignment
+                            </button>
+                        </form>
+                        <div id="responseMessage" style="margin-top: 1em;"></div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -327,7 +342,40 @@
                 this.nextElementSibling.nextElementSibling.textContent = fileName;
             });
         }
-        
+        const assignmentForm = document.getElementById("assignmentForm")
+        if (assignmentForm) {
+            assignmentForm.addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const messageBox = document.getElementById("responseMessage");
+
+                try {
+                    const response = await fetch("/courses/api/submit-assignment", {
+                        method: "POST",
+                        headers: {
+                            // Don't set Content-Type! Let fetch handle it for FormData
+                            "X-CSRFToken": getCookie("csrftoken"), // CSRF token for Django
+                        },
+                        body: formData,
+                        credentials: 'include'
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        form.style.display = "none";
+                        messageBox.innerHTML = `<p style="color: green;">${data.message}</p>`;
+                    } else {
+                        messageBox.innerHTML = `<p style="color: red;">${data.message || "Something went wrong."}</p>`;
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    messageBox.innerHTML = `<p style="color: red;">An error occurred while submitting.</p>`;
+                }
+            });
+        }
         // Quiz option selection
         window.selectOption = function(element) {
             // Find all options in the same question
