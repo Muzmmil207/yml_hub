@@ -18,16 +18,11 @@ class Quiz(models.Model):
         help_text="Enter the quiz title (max 255 characters).",
         verbose_name="Quiz Title",
     )
-    description = models.TextField(
+    description = CKEditor5Field(
         blank=True,
         null=True,
         help_text="Provide a brief description of the quiz (optional).",
         verbose_name="Quiz Description",
-    )
-    max_score = models.PositiveIntegerField(
-        default=100,
-        help_text="Set the maximum score a student can achieve in this quiz.",
-        verbose_name="Maximum Score",
     )
 
     def __str__(self):
@@ -38,37 +33,22 @@ class Quiz(models.Model):
         verbose_name_plural = "Quizzes"
 
 
-class Question(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
-    text = CKEditor5Field()
-    question_type = models.CharField(
-        max_length=10,
-        choices=[("MCQ", "Multiple Choice"), ("TEXT", "Text Input")],
-        default="MCQ",
-    )
-
-    def __str__(self):
-        return f"Question: {self.text} (Quiz: {self.quiz.title})"
-
-
 class Answer(models.Model):
-    question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name="answers"
-    )
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="answers")
     text = models.CharField(max_length=255)
-    is_correct = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Answer: {self.text} (Correct: {self.is_correct})"
+        return f"Answer: {self.text}"
 
 
 class QuizAttempt(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="attempts")
-    score = models.PositiveIntegerField(default=0)
-    completed = models.BooleanField(default=False)
-    started_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(blank=True, null=True)
+    answer = models.CharField(max_length=255)
+    is_correct = models.BooleanField(default=False)
+    answered_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.student.username} - {self.quiz.title} (Score: {self.score})"
+        return (
+            f"{self.student.username} - {self.quiz.title} (Correct: {self.is_correct})"
+        )

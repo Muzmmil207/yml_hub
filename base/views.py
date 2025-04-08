@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpRequest
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 
-from courses.models import Course, CourseCategory
+from courses.models import Course, CourseCategory, Lesson
 
 
 def landing_page(request: HttpRequest):
@@ -27,7 +27,10 @@ def profile_view(request: HttpRequest):
 
 @login_required
 def lesson_view(request: HttpRequest, course_title, lesson_id):
-    return render(request, "base/lesson.html")
+    lesson = get_object_or_404(Lesson, id=lesson_id, course__title=course_title)
+    course_lessons = Lesson.objects.filter(course=lesson.course)
+    context = {"lesson": lesson, "course_lessons": course_lessons}
+    return render(request, "base/lesson.html", context)
 
 
 @login_required

@@ -184,6 +184,9 @@ class Lesson(models.Model):
         help_text="Enter the lesson title (max 255 characters).",
         verbose_name="Lesson Title",
     )
+    introduction = models.TextField(
+        verbose_name="Lesson Introduction",
+    )  # Consider using a CKEditor5Field if available
     content = CKEditor5Field(
         help_text="Provide the lesson content. You can use formatted text if supported.",
         verbose_name="Lesson Content",
@@ -214,6 +217,11 @@ class Lesson(models.Model):
         verbose_name = "Course Lesson"
         verbose_name_plural = "Course Lessons"
 
+    @property
+    def attachments_url(self):
+        if self.attachments:  # If an attachments is uploaded
+            return self.attachments.url
+    
     def __str__(self):
         return f"{self.course.title} - {self.title}"
 
@@ -229,10 +237,10 @@ class LessonProgress(models.Model):
         return f"{self.student.username} - {self.lesson.title} - {'Completed' if self.completed else 'In Progress'}"
 
 class Assignment(models.Model):
-    lesson = models.ForeignKey(
+    lesson = models.OneToOneField(
         Lesson,
         on_delete=models.CASCADE,
-        related_name="assignments",
+        related_name="assignment",
         help_text="Select the lesson this assignment belongs to.",
         verbose_name="Lesson",
     )

@@ -36,13 +36,13 @@ class CourseAdminForm(forms.ModelForm):
 class QuizInline(admin.TabularInline):  # Use StackedInline for more space
     model = Quiz
     extra = 1  # Number of empty forms displayed
-    fields = ["title", "description", "max_score"]
+    fields = ["title", "description"]
 
 
 class AssignmentInline(admin.TabularInline):
     model = Assignment
     extra = 1
-    fields = ["title", "instructions", "due_date", "max_score"]
+    fields = ["title", "instructions", "due_date"]
 
 
 ### Inline for Lesson inside CourseAdmin
@@ -73,12 +73,6 @@ class CourseAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(instructor=request.user)
 
-    def save_model(self, request, obj, form, change):
-        """Automatically assign instructor if not set."""
-        if not obj.instructor_id:
-            obj.instructor = request.user
-        obj.save()
-
 
 ### Lesson Admin (With Quizzes and Assignments Inline)
 class LessonAdmin(admin.ModelAdmin):
@@ -92,12 +86,6 @@ class LessonAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(instructor=request.user)
-
-    def save_model(self, request, obj, form, change):
-        """Automatically assign instructor if not set."""
-        if not obj.instructor_id:
-            obj.instructor = request.user
-        obj.save()
 
 
 class EnrollmentAdmin(admin.ModelAdmin):

@@ -1,3 +1,442 @@
 {% extends "base/base.html" %}
 {% load static %}
-{% block title %}Lesson{% endblock %}
+{% load file_extras %}
+{% block title %}{{lesson.title}}{% endblock %}
+
+
+{% block content %}
+<!-- Toast Notification -->
+<div id="toast" class="toast bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center">
+    <i data-feather="check-circle" class="h-5 w-5 mr-2"></i>
+    <span id="toast-message"></span>
+</div>
+
+<main class="flex-1 overflow-y-auto bg-gray-50">
+    <div class="flex flex-col md:flex-row">
+        <!-- Lesson Content -->
+        <div class="flex-1 p-4 md:p-6">
+            <!-- Lesson Header -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">{{lesson.title}}</h1>
+                        <div class="flex items-center mt-2 text-gray-600">
+                            <div class="flex items-center">
+                                <i data-feather="clock" class="h-4 w-4 mr-1"></i>
+                                <span class="text-sm">Duration: {{lesson.get_duration_display}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out flex items-center" onclick="showToast('Lesson marked as complete!')">
+                            <i data-feather="check" class="h-4 w-4 mr-2"></i>
+                            <span>Mark as Complete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lesson Content -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Introduction</h2>
+                <p class="text-gray-700 mb-4">
+                    {{lesson.introduction}}
+                </p>
+
+                {% if lesson.video_url %}
+                <!-- Video Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Video Lecture</h3>
+                    <div class="video-container rounded-lg overflow-hidden">
+                        <iframe src="{{lesson.video_url}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Text Content -->
+                <div class="mb-6">
+                    {{lesson.content|safe}}
+                </div>
+
+                {% if lesson.attachments_url %}
+                <!-- Attached Files -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Attached Files</h3>
+                    <div class="space-y-2">
+                        <a href="{{lesson.attachments_url}}" download class="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition duration-200">
+                            <i data-feather="file-text" class="h-5 w-5 text-blue-500 mr-3"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">{{lesson.attachments.name}}</p>
+                                <p class="text-xs text-gray-500">{{lesson.attachments|extension}}, {{lesson.attachments.size|filesizeformat}}</p>
+                            </div>
+                            <i data-feather="download" class="h-5 w-5 text-gray-400 ml-auto"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+
+            {% if lesson.assignment %}
+            <!-- Assignment Section -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Assignment</h2>
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{lesson.assignment.title}}</h3>
+                    <div class="text-gray-700 mb-4">
+                        {{lesson.assignment.instructions|safe}}
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label for="assignment-submission" class="block text-sm font-medium text-gray-700 mb-2">Submit Your Assignment</label>
+                        <div class="flex items-center">
+                            <input type="file" id="assignment-submission" class="hidden">
+                            <label for="assignment-submission" class="cursor-pointer bg-white border border-gray-300 rounded-md py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                                <i data-feather="upload" class="h-4 w-4 inline mr-1"></i>
+                                Choose File
+                            </label>
+                            <span class="ml-3 text-sm text-gray-500">No file chosen</span>
+                        </div>
+                        <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out" onclick="showToast('Assignment submitted successfully!')">
+                            Submit Assignment
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Quiz Section -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Quiz: Variables and Data Types</h2>
+                <p class="text-gray-700 mb-4">
+                    Test your understanding of JavaScript variables, data types, and operators with this quiz.
+                </p>
+                
+                <form id="quiz-form">
+                    <!-- Multiple Choice Question -->
+                    <div class="mb-6">
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">1. Which keyword is used to declare a constant variable in JavaScript?</h3>
+                        <div class="space-y-2 mt-3">
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>var</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>let</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>const</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>function</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Input Question -->
+                    <div class="mb-6">
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">2. What will be the output of the following code?</h3>
+                        <div class="bg-gray-100 p-3 rounded-md mb-3">
+                            <pre class="text-sm text-gray-800"><code>console.log(10 + "20");</code></pre>
+                        </div>
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer">
+                    </div>
+                    
+                    <!-- Multiple Choice Question -->
+                    <div class="mb-6">
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">3. Which of the following is NOT a primitive data type in JavaScript?</h3>
+                        <div class="space-y-2 mt-3">
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>String</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>Array</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>Boolean</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>Number</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Input Question -->
+                    <div class="mb-6">
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">4. What is the result of the expression: 5 === "5"?</h3>
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer (true or false)">
+                    </div>
+                    
+                    <!-- Multiple Choice Question -->
+                    <div class="mb-6">
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">5. Which operator is used for exponentiation in JavaScript?</h3>
+                        <div class="space-y-2 mt-3">
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>^</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>**</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>^^</span>
+                            </div>
+                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
+                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
+                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
+                                </div>
+                                <span>%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition duration-300 ease-in-out" onclick="showToast('Quiz submitted successfully!')">
+                        Submit Quiz
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between mt-6">
+                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                    <i data-feather="arrow-left" class="h-4 w-4 mr-1"></i>
+                    Previous Lesson
+                </a>
+                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                    Next Lesson
+                    <i data-feather="arrow-right" class="h-4 w-4 ml-1"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Sidebar - Course Outline -->
+        <div class="hidden md:block w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Course Outline</h3>
+            <ul class="space-y-1">
+                {% for course_lesson in course_lessons %}
+                <li>
+                    <a href="#" class="flex items-center p-2 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <div class="h-5 w-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs mr-3">
+                            <i data-feather="check" class="h-3 w-3"></i>
+                        </div>
+                        <div class="h-5 w-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs mr-3">
+                            {{forloop.counter}}
+                        </div>
+                        <span>Introduction to JavaScript</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize Feather Icons
+    document.addEventListener('DOMContentLoaded', function() {
+        feather.replace();
+        
+        // Initialize i18next
+        i18next.init({
+            lng: 'en',
+            debug: false,
+            resources: {
+                en: {
+                    translation: {
+                        brand: "YML Hub",
+                        language: "English",
+                        nav: {
+                            dashboard: "Dashboard",
+                            courses: "My Courses",
+                            quizzes: "Quizzes & Assignments",
+                            progress: "Progress Tracking",
+                            reviews: "Reviews & Feedback",
+                            student: "Student"
+                        },
+                        user: {
+                            profile: "Profile",
+                            settings: "Settings",
+                            logout: "Logout"
+                        }
+                    }
+                },
+                ar: {
+                    translation: {
+                        brand: "مركز تعلم العقول الشابة",
+                        language: "العربية",
+                        nav: {
+                            dashboard: "لوحة التحكم",
+                            courses: "دوراتي",
+                            quizzes: "الاختبارات والواجبات",
+                            progress: "تتبع التقدم",
+                            reviews: "التقييمات والملاحظات",
+                            student: "طالب"
+                        },
+                        user: {
+                            profile: "الملف الشخصي",
+                            settings: "الإعدادات",
+                            logout: "تسجيل الخروج"
+                        }
+                    }
+                }
+            }
+        }, function(err, t) {
+            updateContent();
+        });
+        
+        // Sidebar toggle functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        
+        // Make these functions globally available
+        window.toggleSidebar = toggleSidebar;
+        window.closeSidebar = closeSidebar;
+        
+        // Language Dropdown Toggle
+        const langToggle = document.getElementById('language-toggle');
+        const langDropdown = document.getElementById('language-dropdown');
+        
+        langToggle.addEventListener('click', function() {
+            langDropdown.classList.toggle('hidden');
+        });
+        
+        // User Dropdown Toggle
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        userMenuButton.addEventListener('click', function() {
+            userDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!langToggle.contains(event.target) && !langDropdown.contains(event.target)) {
+                langDropdown.classList.add('hidden');
+            }
+            
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Language Selection
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLang = document.getElementById('current-lang');
+        const htmlElement = document.documentElement;
+        
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                i18next.changeLanguage(lang, function() {
+                    updateContent();
+                    langDropdown.classList.add('hidden');
+                    
+                    // Update direction based on language
+                    if (lang === 'ar') {
+                        htmlElement.setAttribute('dir', 'rtl');
+                        document.body.classList.add('rtl');
+                        document.body.classList.remove('ltr');
+                    } else {
+                        htmlElement.setAttribute('dir', 'ltr');
+                        document.body.classList.add('ltr');
+                        document.body.classList.remove('rtl');
+                    }
+                });
+            });
+        });
+        
+        // Update content with translations
+        function updateContent() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = i18next.t(key);
+            });
+        }
+        
+        // File input display
+        const fileInput = document.getElementById('assignment-submission');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+                this.nextElementSibling.nextElementSibling.textContent = fileName;
+            });
+        }
+        
+        // Quiz option selection
+        window.selectOption = function(element) {
+            // Find all options in the same question
+            const questionDiv = element.closest('div').parentElement;
+            const options = questionDiv.querySelectorAll('.quiz-option');
+            
+            // Remove selected class from all options
+            options.forEach(option => {
+                option.classList.remove('selected');
+                option.querySelector('.h-3').classList.add('hidden');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            element.querySelector('.h-3').classList.remove('hidden');
+        };
+        
+        // Toast notification function
+        window.showToast = function(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+    });
+</script>
+{% endblock %}
