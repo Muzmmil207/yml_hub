@@ -80,3 +80,19 @@ def enroll_in_course(request, course_id):
         return redirect(f"/{course.title}/lesson/{first_lesson.id}/")
     else:
         return Response({"detail": "No lessons found in this course."}, status=404)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def mark_lesson_as_complete(request, lesson_id):
+    user = request.user
+
+    try:
+        lesson_progress = LessonProgress.objects.get(lesson__id=lesson_id, student=user)
+        lesson_progress.completed = True
+        lesson_progress.save()
+        return Response({}, status=200)
+    except:
+        pass
+
+    return Response({"detail": "No lessons found in this course."}, status=404)

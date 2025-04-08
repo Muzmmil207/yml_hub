@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 
-from courses.models import Course, CourseCategory, Lesson
+from courses.models import Course, CourseCategory, Lesson, LessonProgress
 
 
 def landing_page(request: HttpRequest):
@@ -28,8 +28,16 @@ def profile_view(request: HttpRequest):
 @login_required
 def lesson_view(request: HttpRequest, course_title, lesson_id):
     lesson = get_object_or_404(Lesson, id=lesson_id, course__title=course_title)
+    lesson_progress = LessonProgress.objects.get(
+        lesson__id=lesson.id, student=request.user
+    )
     course_lessons = Lesson.objects.filter(course=lesson.course)
-    context = {"lesson": lesson, "course_lessons": course_lessons}
+
+    context = {
+        "lesson": lesson,
+        "course_lessons": course_lessons,
+        "lesson_progress": lesson_progress,
+    }
     return render(request, "base/lesson.html", context)
 
 

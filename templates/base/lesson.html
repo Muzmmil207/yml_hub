@@ -28,10 +28,17 @@
                         </div>
                     </div>
                     <div class="mt-4 md:mt-0">
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out flex items-center" onclick="showToast('Lesson marked as complete!')">
+                        {% if lesson_progress.completed %}
+                        <button class="bg-green-500 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out flex items-center" id="mark-complete">
+                            <i data-feather="check" class="h-4 w-4 mr-2"></i>
+                            <span>Completed</span>
+                        </button>
+                        {% else %}
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300 ease-in-out flex items-center" id="mark-complete">
                             <i data-feather="check" class="h-4 w-4 mr-2"></i>
                             <span>Mark as Complete</span>
                         </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -107,120 +114,22 @@
             
             <!-- Quiz Section -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Quiz: Variables and Data Types</h2>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">{{lesson.title}} - Quizzes</h2>
                 <p class="text-gray-700 mb-4">
-                    Test your understanding of JavaScript variables, data types, and operators with this quiz.
+                    Test your understanding of of this lesson with these quizzes.
                 </p>
                 
                 <form id="quiz-form">
-                    <!-- Multiple Choice Question -->
-                    <div class="mb-6">
-                        <h3 class="text-md font-semibold text-gray-800 mb-2">1. Which keyword is used to declare a constant variable in JavaScript?</h3>
-                        <div class="space-y-2 mt-3">
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>var</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>let</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>const</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>function</span>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Text Input Question -->
+                    {% for quiz in lesson.quizzes.all %}
                     <div class="mb-6">
-                        <h3 class="text-md font-semibold text-gray-800 mb-2">2. What will be the output of the following code?</h3>
+                        <h3 class="text-md font-semibold text-gray-800 mb-2">{{quiz.title}}</h3>
                         <div class="bg-gray-100 p-3 rounded-md mb-3">
-                            <pre class="text-sm text-gray-800"><code>console.log(10 + "20");</code></pre>
+                            {{quiz.description|safe}}
                         </div>
-                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer">
+                        <input type="text" name="{{quiz.id}}" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer">
                     </div>
-                    
-                    <!-- Multiple Choice Question -->
-                    <div class="mb-6">
-                        <h3 class="text-md font-semibold text-gray-800 mb-2">3. Which of the following is NOT a primitive data type in JavaScript?</h3>
-                        <div class="space-y-2 mt-3">
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>String</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>Array</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>Boolean</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>Number</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Text Input Question -->
-                    <div class="mb-6">
-                        <h3 class="text-md font-semibold text-gray-800 mb-2">4. What is the result of the expression: 5 === "5"?</h3>
-                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer (true or false)">
-                    </div>
-                    
-                    <!-- Multiple Choice Question -->
-                    <div class="mb-6">
-                        <h3 class="text-md font-semibold text-gray-800 mb-2">5. Which operator is used for exponentiation in JavaScript?</h3>
-                        <div class="space-y-2 mt-3">
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>^</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>**</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>^^</span>
-                            </div>
-                            <div class="quiz-option flex items-center p-3 border border-gray-200 rounded-md cursor-pointer" onclick="selectOption(this)">
-                                <div class="h-5 w-5 rounded-full border border-gray-300 mr-3 flex items-center justify-center">
-                                    <div class="h-3 w-3 rounded-full bg-blue-500 hidden"></div>
-                                </div>
-                                <span>%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
+                    {% endfor %}
                     <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition duration-300 ease-in-out" onclick="showToast('Quiz submitted successfully!')">
                         Submit Quiz
                     </button>
@@ -281,10 +190,6 @@
                         nav: {
                             dashboard: "Dashboard",
                             courses: "My Courses",
-                            quizzes: "Quizzes & Assignments",
-                            progress: "Progress Tracking",
-                            reviews: "Reviews & Feedback",
-                            student: "Student"
                         },
                         user: {
                             profile: "Profile",
@@ -300,10 +205,6 @@
                         nav: {
                             dashboard: "لوحة التحكم",
                             courses: "دوراتي",
-                            quizzes: "الاختبارات والواجبات",
-                            progress: "تتبع التقدم",
-                            reviews: "التقييمات والملاحظات",
-                            student: "طالب"
                         },
                         user: {
                             profile: "الملف الشخصي",
@@ -399,6 +300,25 @@
             });
         }
         
+        const markComplete = document.getElementById('mark-complete')
+        markComplete.addEventListener('click',async function(e) {
+            markComplete.disabled = true
+
+            const response = await fetch(`/courses/api/mark-lesson-as-complete/{{lesson.id}}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Required for session-based POST
+                },
+                credentials: 'include'  // Include cookies/session
+            });
+            
+            markComplete.classList.replace('bg-blue-500','bg-green-500')
+            markComplete.classList.remove('hover:bg-blue-600')
+            markComplete.innerHTML = `<i data-feather="check" class="h-4 w-4 mr-2"></i><span>Completed</span>`
+            showToast('Lesson marked as complete!')
+        });
+
         // File input display
         const fileInput = document.getElementById('assignment-submission');
         if (fileInput) {
