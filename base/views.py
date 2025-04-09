@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.text import slugify
 
 from courses.models import (
     AssignmentSubmission,
@@ -38,7 +39,39 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
     lesson_progress = LessonProgress.objects.get(
         lesson__id=lesson.id, student=request.user
     )
-    course_lessons = Lesson.objects.filter(course=lesson.course)
+
+    # Get next lesson (greater id in the same course)
+    next_lesson = (
+        Lesson.objects.filter(course=lesson.course, id__gt=lesson.id)
+        .order_by("id")
+        .first()
+    )
+
+    # Get previous lesson (smaller id in the same course)
+    previous_lesson = (
+        Lesson.objects.filter(course=lesson.course, id__lt=lesson.id)
+        .order_by("-id")
+        .first()
+    )
+
+    course_lessons = list()
+    course_title = slugify(lesson.course.title, allow_unicode=True)
+    for course_lesson in Lesson.objects.filter(course=lesson.course):
+        is_completed = False
+        course_lesson_progress = LessonProgress.objects.filter(
+            lesson__id=lesson.id, student=request.user
+        )
+        if course_lesson_progress.exists():
+            is_completed = course_lesson_progress[0].completed
+
+        course_lessons.append(
+            {
+                "id": course_lesson.id,
+                "title": course_lesson.title,
+                "is_completed": is_completed,
+            }
+        )
+
     assignment_submission = AssignmentSubmission.objects.filter(
         assignment=lesson.assignment, student=request.user
     )
@@ -61,6 +94,9 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
         "lesson_progress": lesson_progress,
         "assignment_submission": assignment_submission,
         "attempts": attempts_dict,
+        "course_title": course_title,
+        "next_lesson": next_lesson,
+        "previous_lesson": previous_lesson,
     }
     return render(request, "base/lesson.html", context)
 

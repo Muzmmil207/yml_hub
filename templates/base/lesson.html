@@ -181,31 +181,37 @@
 
             <!-- Navigation Buttons -->
             <div class="flex justify-between mt-6">
-                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                {% if next_lesson %}
+                <a href="{% url 'lesson' course_title next_lesson.id %}" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                     <i data-feather="arrow-left" class="h-4 w-4 mr-1"></i>
                     Previous Lesson
                 </a>
-                <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                {% endif %}
+                {% if previous_lesson %}
+                <a href="{% url 'lesson' course_title previous_lesson.id %}" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                     Next Lesson
                     <i data-feather="arrow-right" class="h-4 w-4 ml-1"></i>
                 </a>
+                {% endif %}
             </div>
         </div>
-        
+
         <!-- Sidebar - Course Outline -->
         <div class="hidden md:block w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Course Outline</h3>
             <ul class="space-y-1">
                 {% for course_lesson in course_lessons %}
                 <li>
-                    <a href="#" class="flex items-center p-2 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                    <a href="{% url 'lesson' course_title course_lesson.id %}" class="flex items-center p-2 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        {% if course_lesson.is_completed%}
                         <div class="h-5 w-5 rounded-full bg-green-500 text-white flex items-center justify-center text-xs mr-3">
                             <i data-feather="check" class="h-3 w-3"></i>
                         </div>
+                        {% endif %}
                         <div class="h-5 w-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs mr-3">
                             {{forloop.counter}}
                         </div>
-                        <span>Introduction to JavaScript</span>
+                        <span>{{course_lesson.title}}</span>
                     </a>
                 </li>
                 {% endfor %}

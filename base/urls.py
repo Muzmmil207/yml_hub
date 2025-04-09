@@ -7,5 +7,5 @@ urlpatterns = [
     path("dashboard/", dashboard_view, name="dashboard"),
     path("profile/", profile_view, name="profile"),
     path("courses/", courses_view, name="courses"),
-    path("<str:course_title>/lesson/<int:lesson_id>/", lesson_view, name="lesson"),
+    path("<slug:course_title>/lesson/<int:lesson_id>/", lesson_view, name="lesson"),
 ]
