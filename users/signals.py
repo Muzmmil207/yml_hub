@@ -26,6 +26,7 @@ def handle_user_creation(sender, instance: CustomUser, created, **kwargs):
                     "quiz",
                     "assignment",
                     "coursecategory",
+                    "assignmentsubmission",
                 ]
             )
             instance.user_permissions.set(permissions)

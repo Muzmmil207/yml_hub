@@ -1,6 +1,8 @@
 {% extends "base/base.html" %}
 {% load static %}
 {% load file_extras %}
+{% load dict_filters %}
+
 {% block title %}{{lesson.title}}{% endblock %}
 
 
@@ -126,7 +128,8 @@
                 </div>
             </div>
             {% endif %}
-            
+
+            {% if lesson.quizzes.all %}
             <!-- Quiz Section -->
             <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">{{lesson.title}} - Quizzes</h2>
@@ -134,23 +137,48 @@
                     Test your understanding of of this lesson with these quizzes.
                 </p>
                 
-                <form id="quiz-form">
+                <form id="quizzes-form" method="post">
                     <!-- Text Input Question -->
                     {% for quiz in lesson.quizzes.all %}
                     <div class="mb-6">
+                        {% with attempts|dictkey:quiz.id as attempt %}
+
                         <h3 class="text-md font-semibold text-gray-800 mb-2">{{quiz.title}}</h3>
                         <div class="bg-gray-100 p-3 rounded-md mb-3">
                             {{quiz.description|safe}}
                         </div>
-                        <input type="text" name="{{quiz.id}}" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer">
+                        <input type="text" name="{{quiz.id}}"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your answer"
+                            {% if attempt %}
+                                value="{{ attempt.answer }}"
+                            {% endif %}
+                            required
+                         >
+                         
+                        <div class="mt-4">
+                            {% if attempt %}
+                            <small style="color: {% if attempt.is_correct %}green{% else %}red{% endif %};">
+                              Your previous answer: "{{ attempt.answer }}" – 
+                              {% if attempt.is_correct %}
+                                Correct ✅
+                              {% else %}
+                                Incorrect ❌
+                              {% endif %}
+                            </small>
+                          {% endif %}
+                        </div>
+                        {% endwith %}
                     </div>
+
                     {% endfor %}
-                    <button type="button" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition duration-300 ease-in-out" onclick="showToast('Quiz submitted successfully!')">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition duration-300 ease-in-out">
                         Submit Quiz
                     </button>
                 </form>
+                <div id="quizzes-result"></div>
             </div>
-            
+            {% endif %}
+
             <!-- Navigation Buttons -->
             <div class="flex justify-between mt-6">
                 <a href="#" class="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
@@ -342,6 +370,7 @@
                 this.nextElementSibling.nextElementSibling.textContent = fileName;
             });
         }
+
         const assignmentForm = document.getElementById("assignmentForm")
         if (assignmentForm) {
             assignmentForm.addEventListener("submit", async function (e) {
@@ -376,6 +405,39 @@
                 }
             });
         }
+
+
+        const quizzesForm= document.getElementById("quizzes-form")
+        if (quizzesForm){
+            quizzesForm.addEventListener("submit", async function (e) {
+                e.preventDefault();
+                showToast('Quiz submitted successfully!')
+                const form = e.target;
+                const formData = new FormData(form);
+                const data = {};
+
+                for (const [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+
+                const response = await fetch("/quizzes/api/submit-quiz-answers", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                document.getElementById("quizzes-result").innerHTML = result.results.map(r => (
+                    `<p><strong>${r.quiz_title}</strong>: Your answer "${r.your_answer}" is <span style="color:${r.is_correct ? 'green' : 'red'}">${r.is_correct ? 'Correct' : 'Wrong'}</span></p>`
+                )).join("");
+            });
+        }
+
         // Quiz option selection
         window.selectOption = function(element) {
             // Find all options in the same question

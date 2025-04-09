@@ -24,6 +24,7 @@ class Quiz(models.Model):
         help_text="Provide a brief description of the quiz (optional).",
         verbose_name="Quiz Description",
     )
+    answer = models.CharField(max_length=255, help_text="The quiz answer")
 
     def __str__(self):
         return f"Quiz: {self.title} (Lesson: {self.lesson.title})"
@@ -31,14 +32,6 @@ class Quiz(models.Model):
     class Meta:
         verbose_name = "Quiz"
         verbose_name_plural = "Quizzes"
-
-
-class Answer(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="answers")
-    text = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"Answer: {self.text}"
 
 
 class QuizAttempt(models.Model):

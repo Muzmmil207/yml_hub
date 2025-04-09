@@ -10,6 +10,7 @@ from courses.models import (
     Lesson,
     LessonProgress,
 )
+from quizzes.models import QuizAttempt
 
 
 def landing_page(request: HttpRequest):
@@ -44,11 +45,22 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
     if assignment_submission.exists():
         assignment_submission = assignment_submission.first()
 
+    quizzes = lesson.quizzes.all()
+
+    # Get all quiz attempts by this user for this lesson
+    attempts = QuizAttempt.objects.filter(
+        student=request.user, quiz__in=quizzes
+    ).select_related("quiz")
+
+    # Map attempts by quiz id for easier lookup in template
+    attempts_dict = {attempt.quiz.id: attempt for attempt in attempts}
+
     context = {
         "lesson": lesson,
         "course_lessons": course_lessons,
         "lesson_progress": lesson_progress,
         "assignment_submission": assignment_submission,
+        "attempts": attempts_dict,
     }
     return render(request, "base/lesson.html", context)
 

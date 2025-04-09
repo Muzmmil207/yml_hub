@@ -37,6 +37,7 @@ DJANGO_COMMON_APPS = [
     "django.contrib.staticfiles",
 ]
 LOCAL_APPS = [
+    "base",
     "users",
     "courses",
     "quizzes",

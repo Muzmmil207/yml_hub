@@ -3,7 +3,15 @@ from django.contrib import admin
 
 from quizzes.models import Quiz
 
-from .models import Assignment, Course, CourseCategory, CourseReview, Enrollment, Lesson
+from .models import (
+    Assignment,
+    AssignmentSubmission,
+    Course,
+    CourseCategory,
+    CourseReview,
+    Enrollment,
+    Lesson,
+)
 
 
 # Custom form to exclude instructor from visible fields
@@ -113,6 +121,18 @@ class CourseReviewAdmin(admin.ModelAdmin):
     list_display = ("id", "course", "user", "rating", "created_at")
     search_fields = ("course__name", "user__username")
     list_filter = ("rating", "created_at")
+
+
+@admin.register(AssignmentSubmission)
+class AssignmentSubmissionAdmin(admin.ModelAdmin):
+    list_display = ("assignment", "student", "submitted_at", "score")
+    list_filter = ("assignment", "score", "is_reviewed")
+    search_fields = ("student__username", "assignment__title")
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing submission
+            return ("assignment", "student")
+        return ()
 
 
 # Register models

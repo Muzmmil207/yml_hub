@@ -294,7 +294,7 @@ class AssignmentSubmission(models.Model):
         upload_to="assignment-submissions/", help_text="file upload for submission"
     )
     score = models.PositiveIntegerField(
-        blank=True, null=True, help_text="Score given by the teacher"
+        blank=False, null=True, help_text="Score given by the teacher"
     )
     feedback = models.TextField(
         blank=True, null=True, help_text="Optional feedback from teacher"
