@@ -97,12 +97,12 @@
                     <div class="flex items-center">
                         <div class="stars">
                             {% for i in "12345"|make_list %}
-                            {% if forloop.counter <= course.rating %} <i data-feather="star"
-                                class="h-4 w-4 fill-current"></i>
+                                {% if forloop.counter <= course.rating %}
+                                <i data-feather="star" class="h-4 w-4 fill-current"></i>
                                 {% else %}
                                 <i data-feather="star" class="h-4 w-4"></i>
                                 {% endif %}
-                                {% endfor %}
+                            {% endfor %}
                         </div>
                         <span class="text-xs text-gray-600 ml-1">{{course.rating}} ({{course.review_count}})</span>
                     </div>
@@ -490,7 +490,7 @@
                 div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-md';
                 div.innerHTML = `
                     <div class="flex items-center">
-                        <i data-feather="${lesson.locked ? 'lock' : 'play-circle'}" class="h-5 w-5 ${lesson.locked ? 'text-gray-400' : 'text-blue-500'} mr-2"></i>
+                        <i data-feather="play-circle" class="h-5 w-5 text-blue-500 mr-2"></i>
                         <span class="text-sm">${lesson.title}</span>
                     </div>
                     <span class="text-xs text-gray-500">${lesson.duration}</span>

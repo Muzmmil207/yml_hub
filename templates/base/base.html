@@ -63,8 +63,32 @@
             color: #FFD700;
         }
 
-          
-        /* Toast notification */
+         /* Star rating input */
+        .star-rating {
+            display: inline-flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        
+        .star-rating input {
+            display: none;
+        }
+        
+        .star-rating label {
+            cursor: pointer;
+            color: #ddd;
+            font-size: 1.5rem;
+            padding: 0 0.1rem;
+            transition: color 0.2s;
+        }
+        
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #FFD700;
+        }
+      
+      
         /* Toast notification */
         .toast {
             position: fixed;
@@ -268,6 +292,40 @@
             background-color: #3b82f6;
             transition: width 0.3s ease;
         }
+
+        
+      /* Lesson item hover */
+      .lesson-item {
+          transition: all 0.2s ease;
+      }
+      
+      .lesson-item:hover {
+          background-color: #eff6ff;
+      }
+      
+      /* Review form */
+      .review-form {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease-out;
+      }
+      
+      .review-form.open {
+          max-height: 500px;
+      }
+      
+      /* Like button animation */
+      .like-button {
+          transition: transform 0.2s;
+      }
+      
+      .like-button:active {
+          transform: scale(1.2);
+      }
+      
+      .like-button.liked {
+          color: #3b82f6;
+      }
     </style>
     <script>
         tailwind.config = {

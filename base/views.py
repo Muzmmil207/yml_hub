@@ -8,6 +8,8 @@ from courses.models import (
     AssignmentSubmission,
     Course,
     CourseCategory,
+    CourseReview,
+    Enrollment,
     Lesson,
     LessonProgress,
 )
@@ -36,7 +38,7 @@ def profile_view(request: HttpRequest):
 @login_required
 def lesson_view(request: HttpRequest, course_title, lesson_id):
     lesson = get_object_or_404(Lesson, id=lesson_id)
-    lesson_progress,_ = LessonProgress.objects.get_or_create(
+    lesson_progress, _ = LessonProgress.objects.get_or_create(
         lesson=lesson, student=request.user
     )
 
@@ -55,7 +57,6 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
     )
 
     course_lessons = list()
-    course_title = slugify(lesson.course.title, allow_unicode=True)
     for course_lesson in Lesson.objects.filter(course=lesson.course):
         is_completed = False
         course_lesson_progress = LessonProgress.objects.filter(
@@ -132,3 +133,17 @@ def courses_view(request: HttpRequest):
         "categories": CourseCategory.objects.all(),
     }
     return render(request, "base/courses.html", context)
+
+
+@login_required
+def course_view(request: HttpRequest, course_slug, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    course_reviews = CourseReview.objects.filter(course=course)
+    enrollment = Enrollment.objects.filter(student=request.user, course=course).first()
+
+    context = {
+        "course": course,
+        "enrollment": enrollment,
+        "course_reviews": course_reviews,
+    }
+    return render(request, "base/course.html", context)

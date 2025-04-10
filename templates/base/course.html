@@ -1,0 +1,746 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load slugify_tags %}
+
+{% block title %}{{course.title}}{% endblock %}
+
+
+{% block content %}
+<!-- Toast Notification -->
+<div id="toast" class="toast bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center">
+    <i data-feather="check-circle" class="h-5 w-5 mr-2"></i>
+    <span id="toast-message">Course enrollment successful!</span>
+</div>
+
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-gray-50">
+ <div class="max-w-7xl mx-auto px-4 py-6">
+     <!-- Course Header -->
+     <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+         <div class="relative">
+             <img id="course-banner" src="{{course.thumbnail_url}}" alt="Course Banner" class="w-full h-64 object-cover">
+             <div class="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded" id="course-badge" data-i18n="courses.popular">Popular</div>
+         </div>
+         <div class="p-6">
+             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                 <div>
+                     <div class="flex items-center mb-2">
+                         <h1 id="course-header-title" class="text-2xl font-bold text-gray-800 mr-3">{{course.title}}</h1>
+                         <span id="course-category" class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">{{course.category}}</span>
+                     </div>
+                     <div class="flex items-center text-gray-600 text-sm mb-4">
+                         <div class="flex items-center mr-4">
+                             <div class="stars mr-1">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= course.rating %}
+                                    <i data-feather="star" class="h-4 w-4 fill-current"></i>
+                                    {% else %}
+                                    <i data-feather="star" class="h-4 w-4"></i>
+                                    {% endif %}
+                                {% endfor %}
+                             </div>
+                             <span id="course-rating">{{course.rating}} ({{course.review_count}})</span>
+                         </div>
+                         <div class="flex items-center">
+                             <i data-feather="users" class="h-4 w-4 mr-1"></i>
+                             <span id="course-students">1,456 students</span>
+                         </div>
+                     </div>
+                     <div class="flex items-center">
+                         <img id="instructor-image" src="{{course.instructor.userprofile.avatar_url}}" alt="Instructor" class="w-10 h-10 rounded-full">
+                         <div class="ml-3">
+                             <p id="instructor-name" class="text-sm font-medium text-gray-800">@{{course.instructor.username}}</p>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="mt-6 md:mt-0">
+                     <button class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium" onclick="showToast('Successfully enrolled in the course!')" data-i18n="course.enroll">
+                         Enroll Now
+                     </button>
+                 </div>
+             </div>
+         </div>
+     </div>
+     
+     <!-- Course Content -->
+     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+         <!-- Left Column - Course Details -->
+         <div class="lg:col-span-2 space-y-6">
+             <!-- Course Description -->
+             <div class="bg-white rounded-lg shadow-sm p-6">
+                 <h2 class="text-xl font-semibold text-gray-800 mb-4" data-i18n="course.about">About This Course</h2>
+                 <p id="course-description" class="text-gray-700 mb-6">
+                    {{course.description}}
+                </p>
+             </div>
+             
+             <!-- Course Content/Curriculum -->
+             <div class="bg-white rounded-lg shadow-sm p-6">
+                 <div class="flex items-center justify-between mb-4">
+                     <h2 class="text-xl font-semibold text-gray-800" data-i18n="course.curriculum">Course Curriculum</h2>
+                     <div class="text-sm text-gray-600">
+                         <span id="lesson-count">{{course.lessons.all.count}} lessons</span> • <span id="course-duration">{{course.get_duration_display}}</span>
+                     </div>
+                 </div>
+                 
+                 <!-- Course Modules -->
+                 <div class="border border-gray-200 rounded-md mb-4 overflow-hidden">
+                     <div class="module-content">
+                        {% for lesson in course.lessons.all %}
+                         <a href="{% url 'lesson' course.title|slugify_filter lesson.id %}" class="lesson-item flex items-center justify-between px-4 py-3 border-t border-gray-200 hover:bg-blue-50">
+                             <div class="flex items-center">
+                                 <i data-feather="play-circle" class="h-5 w-5 text-blue-500 mr-2"></i>
+                                 <span class="text-gray-800">{{lesson.title}}</span>
+                             </div>
+                             <div class="flex items-center">
+                                 <span class="text-xs text-gray-600">{{lesson.get_duration_display}}</span>
+                             </div>
+                         </a>
+                         {% endfor %}
+                     </div>
+                 </div>
+                 
+             </div>
+             
+             <!-- Reviews Section -->
+             <div class="bg-white rounded-lg shadow-sm p-6">
+                 <div class="flex items-center justify-between mb-6">
+                     <h2 class="text-xl font-semibold text-gray-800" data-i18n="course.reviews">Student Reviews</h2>
+                     <div class="flex flex-col">
+                        <div class="flex items-center">
+                            <div class="stars mr-2">
+                                {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= course.rating %}
+                                <i data-feather="star" class="h-4 w-4 fill-current"></i>
+                                {% else %}
+                                <i data-feather="star" class="h-4 w-4"></i>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-lg font-medium" id="average-rating">{{course.rating}}</span>
+                        </div>
+                        <p class="text-gray-700 mb-4">Based on <span id="review-count">{{course.review_count}}</span> reviews</p>
+                    </div>
+                </div>
+                 
+                 <!-- Review Stats -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                     <div>
+                         <button id="write-review-btn" class="bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 px-4 py-2 rounded-md transition duration-300 ease-in-out" data-i18n="course.writeReview">
+                             Write a Review
+                         </button>
+                     </div>
+                 </div>
+                 
+                 <!-- Review Form -->
+                 <div id="review-form" class="review-form mb-6 border border-gray-200 rounded-md p-4 bg-gray-50">
+                     <h3 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="course.yourReview">Your Review</h3>
+                     <form id="submit-review-form">
+                         <div class="mb-4">
+                             <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="course.rating">Rating</label>
+                             <div class="star-rating">
+                                 <input type="radio" id="star5" name="rating" value="5" />
+                                 <label for="star5" title="5 stars">★</label>
+                                 <input type="radio" id="star4" name="rating" value="4" />
+                                 <label for="star4" title="4 stars">★</label>
+                                 <input type="radio" id="star3" name="rating" value="3" />
+                                 <label for="star3" title="3 stars">★</label>
+                                 <input type="radio" id="star2" name="rating" value="2" />
+                                 <label for="star2" title="2 stars">★</label>
+                                 <input type="radio" id="star1" name="rating" value="1" />
+                                 <label for="star1" title="1 star">★</label>
+                             </div>
+                         </div>
+                         <div class="mb-4">
+                             <label for="review-text" class="block text-sm font-medium text-gray-700 mb-2" data-i18n="course.reviewText">Review</label>
+                             <textarea id="review-text" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Share your experience with this course..."></textarea>
+                         </div>
+                         <div class="flex justify-end space-x-2">
+                             <button type="button" id="cancel-review" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" data-i18n="course.cancel">Cancel</button>
+                             <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" data-i18n="course.submit">Submit</button>
+                         </div>
+                     </form>
+                 </div>
+                 
+                 <!-- Individual Reviews -->
+                 <div id="reviews-container" class="space-y-6">
+                    {% for review in course_reviews %}
+                     <!-- Review  -->
+                     <div id="{% if review.user == request.user %}user-review-element{% endif %}" class="border-t border-gray-200 pt-6">
+                         <div class="flex items-start">
+                             <img src="{{review.user.userprofile.avatar_url}}" alt="Reviewer" class="h-10 w-10 rounded-full mr-4">
+                             <div class="flex-1">
+                                 <div class="flex items-center justify-between mb-1">
+                                     <h4 class="font-medium text-gray-800">{{review.user.username}}</h4>
+                                     <span class="text-sm text-gray-500">{{review.created_at|timesince}} ago</span>
+                                 </div>
+                                 <div class="flex items-center mb-2">
+                                     <div class="stars mr-2">
+                                         {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= review.rating %}
+                                            <i data-feather="star" class="h-4 w-4 fill-current"></i>
+                                            {% else %}
+                                            <i data-feather="star" class="h-4 w-4"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                     </div>
+                                 </div>
+                                 <p class="text-gray-700">
+                                    {{review.comment}}
+                                 </p>
+                                 <div class="flex items-center mt-3">
+                                     <button class="like-button flex items-center text-gray-500 hover:text-blue-500" data-review-id="1">
+                                         <i data-feather="thumbs-up" class="h-4 w-4 mr-1"></i>
+                                         <span class="like-count">24</span>
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     {% endfor %}
+                     
+                 </div>
+             </div>
+         </div>
+         
+         <!-- Right Column - Course Info -->
+         <div class="space-y-6">
+             <!-- Course Details Card -->
+             <div class="bg-white rounded-lg shadow-sm p-6">
+                 <h2 class="text-xl font-semibold text-gray-800 mb-4" data-i18n="course.details">Course Details</h2>
+                 <ul class="space-y-4">
+                     <li class="flex items-center">
+                         <i data-feather="clock" class="h-5 w-5 text-gray-500 mr-3"></i>
+                         <div>
+                             <p class="text-sm font-medium text-gray-800" data-i18n="course.duration">Duration</p>
+                             <p id="details-duration" class="text-sm text-gray-600">{{course.get_duration_display}}</p>
+                         </div>
+                     </li>
+                     <li class="flex items-center">
+                         <i data-feather="bar-chart-2" class="h-5 w-5 text-gray-500 mr-3"></i>
+                         <div>
+                             <p class="text-sm font-medium text-gray-800" data-i18n="course.level">Level</p>
+                             <p id="details-level" class="text-sm text-gray-600">{{course.get_level_display}}</p>
+                         </div>
+                     </li>
+                     <li class="flex items-center">
+                         <i data-feather="globe" class="h-5 w-5 text-gray-500 mr-3"></i>
+                         <div>
+                             <p class="text-sm font-medium text-gray-800" data-i18n="course.language">Language</p>
+                             <p id="details-language" class="text-sm text-gray-600">{{course.get_language_display}}</p>
+                         </div>
+                     </li>
+                 </ul>
+
+                 <div class="mt-6 pt-6 border-t border-gray-200">
+                     <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium mb-3" onclick="showToast('Successfully enrolled in the course!')" data-i18n="course.enroll">
+                         Enroll Now
+                     </button>
+                 </div>
+             </div>
+             
+             <!-- Share Card -->
+             <div class="bg-white rounded-lg shadow-sm p-6">
+                 <h2 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="course.share">Share This Course</h2>
+                 <div class="flex space-x-3">
+                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" class="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition duration-200">
+                         <i data-feather="facebook" class="h-5 w-5"></i>
+                     </a>
+                     <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{course.title}}" class="bg-blue-400 text-white p-2 rounded-full hover:bg-blue-500 transition duration-200">
+                         <i data-feather="twitter" class="h-5 w-5"></i>
+                     </a>
+                     <a href="mailto:?subject={{course.title}}&body={{ request.build_absolute_uri }}" class="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition duration-200">
+                         <i data-feather="mail" class="h-5 w-5"></i>
+                     </a>
+                 </div>
+             </div>
+             
+             <!-- Instructor Card -->
+             <div class="bg-white rounded-lg shadow-sm p-6">
+                 <h2 class="text-lg font-semibold text-gray-800 mb-4" data-i18n="course.instructor">Instructor</h2>
+                 <div class="flex items-center mb-4">
+                     <img id="instructor-detail-image" src="{{course.instructor.userprofile.avatar_url}}" alt="Instructor" class="h-16 w-16 rounded-full mr-4">
+                     <div>
+                         <h3 id="instructor-detail-name" class="font-medium text-gray-800">@{{course.instructor.username}}</h3>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize Feather Icons
+    document.addEventListener('DOMContentLoaded', function() {
+        feather.replace();
+        
+        // Initialize i18next
+        i18next.init({
+            lng: 'en',
+            debug: false,
+            resources: {
+                en: {
+                    translation: {
+                        brand: "YML Hub",
+                        language: "English",
+                        nav: {
+                            dashboard: "Dashboard",
+                            courses: "My Courses",
+                            quizzes: "Quizzes & Assignments",
+                            progress: "Progress Tracking",
+                            reviews: "Reviews & Feedback",
+                            student: "Student"
+                        },
+                        user: {
+                            profile: "Profile",
+                            settings: "Settings",
+                            logout: "Logout"
+                        },
+                        course: {
+                            enroll: "Enroll Now",
+                            tryFree: "Try Free Preview",
+                            about: "About This Course",
+                            whatLearn: "What You'll Learn",
+                            requirements: "Requirements",
+                            curriculum: "Course Curriculum",
+                            reviews: "Student Reviews",
+                            viewMoreReviews: "View More Reviews",
+                            writeReview: "Write a Review",
+                            yourReview: "Your Review",
+                            rating: "Rating",
+                            reviewText: "Review",
+                            cancel: "Cancel",
+                            submit: "Submit",
+                            details: "Course Details",
+                            duration: "Duration",
+                            level: "Level",
+                            lastUpdated: "Last Updated",
+                            language: "Language",
+                            certificate: "Certificate",
+                            share: "Share This Course",
+                            instructor: "Instructor"
+                        },
+                        courses: {
+                            popular: "Popular",
+                            new: "New"
+                        }
+                    }
+                },
+                ar: {
+                    translation: {
+                        brand: "مركز تعلم العقول الشابة",
+                        language: "العربية",
+                        nav: {
+                            dashboard: "لوحة التحكم",
+                            courses: "دوراتي",
+                            quizzes: "الاختبارات والواجبات",
+                            progress: "تتبع التقدم",
+                            reviews: "التقييمات والملاحظات",
+                            student: "طالب"
+                        },
+                        user: {
+                            profile: "الملف الشخصي",
+                            settings: "الإعدادات",
+                            logout: "تسجيل الخروج"
+                        },
+                        course: {
+                            enroll: "سجل الآن",
+                            tryFree: "جرب المعاينة المجانية",
+                            about: "عن هذه الدورة",
+                            whatLearn: "ماذا ستتعلم",
+                            requirements: "المتطلبات",
+                            curriculum: "منهج الدورة",
+                            reviews: "آراء الطلاب",
+                            viewMoreReviews: "عرض المزيد من التقييمات",
+                            writeReview: "كتابة تقييم",
+                            yourReview: "تقييمك",
+                            rating: "التقييم",
+                            reviewText: "التعليق",
+                            cancel: "إلغاء",
+                            submit: "إرسال",
+                            details: "تفاصيل الدورة",
+                            duration: "المدة",
+                            level: "المستوى",
+                            lastUpdated: "آخر تحديث",
+                            language: "اللغة",
+                            certificate: "الشهادة",
+                            share: "مشاركة هذه الدورة",
+                            instructor: "المدرس"
+                        },
+                        courses: {
+                            popular: "شائع",
+                            new: "جديد"
+                        }
+                    }
+                }
+            }
+        }, function(err, t) {
+            updateContent();
+        });
+        
+        // Sidebar toggle functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        
+        // Make these functions globally available
+        window.toggleSidebar = toggleSidebar;
+        window.closeSidebar = closeSidebar;
+        
+        // Language Dropdown Toggle
+        const langToggle = document.getElementById('language-toggle');
+        const langDropdown = document.getElementById('language-dropdown');
+        
+        langToggle.addEventListener('click', function() {
+            langDropdown.classList.toggle('hidden');
+        });
+        
+        // User Dropdown Toggle
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        userMenuButton.addEventListener('click', function() {
+            userDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!langToggle.contains(event.target) && !langDropdown.contains(event.target)) {
+                langDropdown.classList.add('hidden');
+            }
+            
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Language Selection
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLang = document.getElementById('current-lang');
+        const htmlElement = document.documentElement;
+        
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                i18next.changeLanguage(lang, function() {
+                    updateContent();
+                    langDropdown.classList.add('hidden');
+                    
+                    // Update direction based on language
+                    if (lang === 'ar') {
+                        htmlElement.setAttribute('dir', 'rtl');
+                        document.body.classList.add('rtl');
+                        document.body.classList.remove('ltr');
+                    } else {
+                        htmlElement.setAttribute('dir', 'ltr');
+                        document.body.classList.add('ltr');
+                        document.body.classList.remove('rtl');
+                    }
+                });
+            });
+        });
+        
+        // Update content with translations
+        function updateContent() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = i18next.t(key);
+            });
+        }
+        
+        // Toggle module content
+        window.toggleModule = function(element) {
+            const moduleContent = element.nextElementSibling;
+            const icon = element.querySelector('i[data-feather="chevron-down"]');
+            
+            moduleContent.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+            
+            // Re-initialize feather icons
+            feather.replace();
+        };
+        
+        // Toast notification function
+        window.showToast = function(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+        
+        // Load course data
+        // In a real application, this would be fetched from an API
+        const courseData = {
+            id: '{{course.id}}',
+        };
+        
+        // Review Form Functionality
+        const reviewForm = document.getElementById('review-form');
+        const writeReviewBtn = document.getElementById('write-review-btn');
+        const cancelReviewBtn = document.getElementById('cancel-review');
+        const submitReviewForm = document.getElementById('submit-review-form');
+        const reviewsContainer = document.getElementById('reviews-container');
+        
+        // Hide review form initially
+        reviewForm.style.maxHeight = '0';
+        
+        // Toggle review form visibility
+        writeReviewBtn.addEventListener('click', function() {
+            reviewForm.classList.toggle('open');
+            if (reviewForm.classList.contains('open')) {
+                reviewForm.style.maxHeight = reviewForm.scrollHeight + 'px';
+                // Check if user has already submitted a review
+                const userReview = getUserReview();
+                if (userReview) {
+                    // Pre-fill the form with existing review
+                    document.querySelector(`input[name="rating"][value="${userReview.rating}"]`).checked = true;
+                    document.getElementById('review-text').value = userReview.text;
+                }
+            } else {
+                reviewForm.style.maxHeight = '0';
+            }
+        });
+        
+        // Cancel review
+        cancelReviewBtn.addEventListener('click', function() {
+            reviewForm.classList.remove('open');
+            reviewForm.style.maxHeight = '0';
+            // Reset form
+            submitReviewForm.reset();
+        });
+        
+        // Submit review
+        submitReviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const reviewText = document.getElementById('review-text').value;
+            
+            if (!rating || !reviewText.trim()) {
+                showToast('Please provide both a rating and review text');
+                return;
+            }
+            
+            // Create or update review
+            submitUserReview(parseInt(rating.value), reviewText.trim());
+            
+            // Hide form
+            reviewForm.classList.remove('open');
+            reviewForm.style.maxHeight = '0';
+            
+            // Reset form
+            submitReviewForm.reset();
+            
+            // Show success message
+            showToast('Your review has been submitted successfully!');
+        });
+        
+        // Like functionality
+        const likeButtons = document.querySelectorAll('.like-button');
+        
+        likeButtons.forEach(button => {
+            const reviewId = button.getAttribute('data-review-id');
+            
+            // Check if user has already liked this review
+            if (hasUserLikedReview(reviewId)) {
+                button.classList.add('liked');
+                button.querySelector('i').classList.add('fill-current');
+            }
+            
+            button.addEventListener('click', function() {
+                const likeCount = this.querySelector('.like-count');
+                const currentLikes = parseInt(likeCount.textContent);
+                
+                if (this.classList.contains('liked')) {
+                    // Unlike
+                    this.classList.remove('liked');
+                    this.querySelector('i').classList.remove('fill-current');
+                    likeCount.textContent = currentLikes - 1;
+                    removeUserLike(reviewId);
+                } else {
+                    // Like
+                    this.classList.add('liked');
+                    this.querySelector('i').classList.add('fill-current');
+                    likeCount.textContent = currentLikes + 1;
+                    addUserLike(reviewId);
+                }
+            });
+        });
+        
+        // Helper functions for user reviews and likes
+        function getUserReview() {
+            const userReviews = JSON.parse(localStorage.getItem('userReviews')) || {};
+            return userReviews[courseData.id];
+        }
+        
+        function submitUserReview(rating, text) {
+            const userReviews = JSON.parse(localStorage.getItem('userReviews')) || {};
+            const isUpdate = !!userReviews[courseData.id];
+            
+            // Create review object
+            const review = {
+                id: 'user-review',
+                courseId: courseData.id,
+                rating: rating,
+                text: text,
+                date: new Date().toISOString(),
+                userName: 'Ahmed Hassan', // Current user
+                userImage: 'https://via.placeholder.com/40'
+            };
+            
+            // Save to localStorage
+            userReviews[courseData.id] = review;
+            localStorage.setItem('userReviews', JSON.stringify(userReviews));
+            
+            // Update UI
+            if (isUpdate) {
+                // Find and update existing review in the DOM
+                updateUserReviewInDOM(review);
+            } else {
+                // Add new review to the DOM
+                addUserReviewToDOM(review);
+            }
+            
+            // Update average rating and review count
+            updateReviewStats();
+        }
+        
+        function addUserReviewToDOM(review) {
+            // Create new review element
+            const reviewElement = document.createElement('div');
+            reviewElement.id = 'user-review-element';
+            reviewElement.className = 'border-t border-gray-200 pt-6';
+            reviewElement.innerHTML = `
+                <div class="flex items-start">
+                    <img src="${review.userImage}" alt="Your Avatar" class="h-10 w-10 rounded-full mr-4">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="font-medium text-gray-800">${review.userName} <span class="text-blue-500 text-sm">(You)</span></h4>
+                            <span class="text-sm text-gray-500">Just now</span>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <div class="stars mr-2">
+                                ${generateStarRating(review.rating)}
+                            </div>
+                        </div>
+                        <p class="text-gray-700">
+                            ${review.text}
+                        </p>
+                        <div class="flex items-center mt-3">
+                            <button class="like-button flex items-center text-gray-500 hover:text-blue-500" data-review-id="user-review">
+                                <i data-feather="thumbs-up" class="h-4 w-4 mr-1"></i>
+                                <span class="like-count">0</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the top of the reviews container
+            const firstReview = reviewsContainer.querySelector('.border-t');
+            reviewsContainer.insertBefore(reviewElement, firstReview);
+            
+            // Re-initialize feather icons
+            feather.replace();
+        }
+        
+        function updateUserReviewInDOM(review) {
+            const reviewElement = document.getElementById('user-review-element');
+            if (reviewElement) {
+                const starsContainer = reviewElement.querySelector('.stars');
+                const reviewText = reviewElement.querySelector('p.text-gray-700');
+                
+                starsContainer.innerHTML = generateStarRating(review.rating);
+                reviewText.textContent = review.text;
+                
+                // Re-initialize feather icons
+                feather.replace();
+            }
+        }
+        
+        function generateStarRating(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i data-feather="star" class="h-4 w-4 fill-current"></i>';
+                } else {
+                    stars += '<i data-feather="star" class="h-4 w-4"></i>';
+                }
+            }
+            return stars;
+        }
+        
+        function updateReviewStats() {
+            const userReview = getUserReview();
+            if (!userReview) return;
+            
+            // For simplicity, we're just updating the average rating display
+            // In a real app, you would recalculate based on all reviews
+            const averageRating = document.getElementById('average-rating');
+            const reviewCount = document.getElementById('review-count');
+            
+            // Simple calculation for demo purposes
+            const currentRating = parseFloat(averageRating.textContent);
+            const currentCount = parseInt(reviewCount.textContent);
+            
+            if (document.getElementById('user-review-element')) {
+                // Update existing review - rating might have changed
+                const newAvg = ((currentRating * currentCount) - userReview.rating + parseInt(userReview.rating)) / currentCount;
+                averageRating.textContent = newAvg.toFixed(1);
+            } else {
+                // New review
+                const newCount = currentCount + 1;
+                const newAvg = ((currentRating * currentCount) + parseInt(userReview.rating)) / newCount;
+                
+                averageRating.textContent = newAvg.toFixed(1);
+                reviewCount.textContent = newCount;
+            }
+        }
+        
+        function hasUserLikedReview(reviewId) {
+            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
+            return userLikes[reviewId] === true;
+        }
+        
+        function addUserLike(reviewId) {
+            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
+            userLikes[reviewId] = true;
+            localStorage.setItem('userLikes', JSON.stringify(userLikes));
+        }
+        
+        function removeUserLike(reviewId) {
+            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
+            delete userLikes[reviewId];
+            localStorage.setItem('userLikes', JSON.stringify(userLikes));
+        }
+        
+        // Check if user has already submitted a review and display it
+        const existingReview = getUserReview();
+        if (existingReview) {
+            addUserReviewToDOM(existingReview);
+            updateReviewStats();
+        }
+    });
+</script>
+{% endblock %}

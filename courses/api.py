@@ -51,7 +51,6 @@ def get_courses(request):
                 {
                     "title": lesson.title,
                     "duration": lesson.get_duration_display(),
-                    "locked": True,
                 }
                 for lesson in lessons
             ],
