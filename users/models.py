@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 
 class CustomUser(AbstractUser):
@@ -46,3 +47,25 @@ class UserProfile(models.Model):
         if self.avatar:  # If an avatar is uploaded
             return self.avatar.url
         return "/images/default-avatar.jpg"
+
+
+class StudentParentLink(models.Model):
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='parent_links',
+        limit_choices_to={'role': 'student'}
+    )
+    parent = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='student_links',
+        limit_choices_to={'role': 'parent'}
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'parent')
+
+    def __str__(self):
+        return f"{self.parent.username} -> {self.student.username}"

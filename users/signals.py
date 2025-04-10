@@ -27,6 +27,7 @@ def handle_user_creation(sender, instance: CustomUser, created, **kwargs):
                     "assignment",
                     "coursecategory",
                     "assignmentsubmission",
+                    "studentparentlink",
                 ]
             )
             instance.user_permissions.set(permissions)

@@ -14,6 +14,7 @@ from courses.models import (
     LessonProgress,
 )
 from quizzes.models import QuizAttempt
+from users.models import StudentParentLink
 
 
 def landing_page(request: HttpRequest):
@@ -147,3 +148,19 @@ def course_view(request: HttpRequest, course_slug, course_id):
         "course_reviews": course_reviews,
     }
     return render(request, "base/course.html", context)
+
+
+@login_required
+def student_dashboard(request):
+
+    context = {}
+    return render(request, "base/student-dashboard.html", context)
+
+
+@login_required
+def parent_dashboard(request):
+    if request.user.role != "parent":
+        return redirect("landing")
+
+    context = {}
+    return render(request, "base/parent-dashboard.html", context)
