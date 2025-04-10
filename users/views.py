@@ -7,7 +7,7 @@ from .forms import LoginForm
 
 def login_view(request: HttpRequest):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("courses")
 
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -17,7 +17,7 @@ def login_view(request: HttpRequest):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)
-                return redirect("dashboard")
+                return redirect("courses")
     else:
         form = LoginForm()
 
