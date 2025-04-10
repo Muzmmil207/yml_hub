@@ -44,7 +44,7 @@ class CourseAdminForm(forms.ModelForm):
 class QuizInline(admin.TabularInline):  # Use StackedInline for more space
     model = Quiz
     extra = 1  # Number of empty forms displayed
-    fields = ["title", "description"]
+    fields = ["title", "description", "answer"]
 
 
 class AssignmentInline(admin.TabularInline):

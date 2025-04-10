@@ -35,9 +35,9 @@ def profile_view(request: HttpRequest):
 
 @login_required
 def lesson_view(request: HttpRequest, course_title, lesson_id):
-    lesson = get_object_or_404(Lesson, id=lesson_id, course__title=course_title)
-    lesson_progress = LessonProgress.objects.get(
-        lesson__id=lesson.id, student=request.user
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    lesson_progress,_ = LessonProgress.objects.get_or_create(
+        lesson=lesson, student=request.user
     )
 
     # Get next lesson (greater id in the same course)
@@ -59,7 +59,7 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
     for course_lesson in Lesson.objects.filter(course=lesson.course):
         is_completed = False
         course_lesson_progress = LessonProgress.objects.filter(
-            lesson__id=lesson.id, student=request.user
+            lesson__id=course_lesson.id, student=request.user
         )
         if course_lesson_progress.exists():
             is_completed = course_lesson_progress[0].completed
@@ -72,12 +72,14 @@ def lesson_view(request: HttpRequest, course_title, lesson_id):
             }
         )
 
-    assignment_submission = AssignmentSubmission.objects.filter(
-        assignment=lesson.assignment, student=request.user
-    )
-    if assignment_submission.exists():
-        assignment_submission = assignment_submission.first()
-
+    try:
+        assignment_submission = AssignmentSubmission.objects.filter(
+            assignment=lesson.assignment, student=request.user
+        )
+        if assignment_submission.exists():
+            assignment_submission = assignment_submission.first()
+    except:
+        assignment_submission = None
     quizzes = lesson.quizzes.all()
 
     # Get all quiz attempts by this user for this lesson

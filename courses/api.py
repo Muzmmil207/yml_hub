@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -75,13 +76,16 @@ def enroll_in_course(request, course_id):
             student=user, lesson__course=course
         ).latest("id")
         if progress:
-            return redirect(f"/{course.title}/lesson/{progress.lesson.id}/")
+            return redirect(
+                f"/{slugify(course.title,allow_unicode=True)}/lesson/{progress.lesson.id}/"
+            )
 
     # New enrollment or no previous progress, redirect to first lesson
     first_lesson = Lesson.objects.filter(course=course).earliest("created_at")
     if first_lesson:
-        LessonProgress.objects.get_or_create(lesson=first_lesson, student=user)
-        return redirect(f"/{course.title}/lesson/{first_lesson.id}/")
+        return redirect(
+            f"/{slugify(course.title,allow_unicode=True)}/lesson/{first_lesson.id}/"
+        )
     else:
         return Response({"detail": "No lessons found in this course."}, status=404)
 
@@ -105,7 +109,6 @@ def mark_lesson_as_complete(request, lesson_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def submit_assignment(request):
-    print("request.data:", request.data)
     serializer = AssignmentSubmissionSerializer(data=request.data)
     if serializer.is_valid():
         assignment = serializer.validated_data["assignment"]
