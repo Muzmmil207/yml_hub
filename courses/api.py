@@ -5,10 +5,10 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from courses.models import Course, Enrollment, Lesson, LessonProgress
+from courses.models import Course, CourseReview, Enrollment, Lesson, LessonProgress
 from users.models import CustomUser
 
-from .models import Assignment, AssignmentSubmission
+from .models import AssignmentSubmission
 from .serializers import AssignmentSubmissionSerializer
 
 
@@ -134,3 +134,27 @@ def submit_assignment(request):
             status=status.HTTP_201_CREATED,
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_review(request):
+    data = request.data
+    course = Course.objects.filter(id=data.get("course_id")).first()
+    if not data.get("comment") or not course:
+        return Response({}, status=400)
+
+    try:
+        review = CourseReview.objects.get(course=course, user=request.user)
+
+        review.rating = data.get("rating", 1)
+        review.comment = data.get("comment", "")
+        review.save()
+    except CourseReview.DoesNotExist:
+        CourseReview.objects.create(
+            course=course,
+            user=request.user,
+            rating=data.get("rating", 1),
+            comment=data.get("comment", ""),
+        )
+    return Response({}, status=201)

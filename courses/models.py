@@ -99,7 +99,7 @@ class Course(models.Model):
     def thumbnail_url(self):
         if self.thumbnail:  # If an thumbnail is uploaded
             return self.thumbnail.url
-        return "/images/default-thumbnail.jpg"
+        return "/static/images/istockphoto-1399506394-612x612.jpg"
 
     @property
     def rating(self):

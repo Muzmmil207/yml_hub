@@ -19,7 +19,6 @@
      <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
          <div class="relative">
              <img id="course-banner" src="{{course.thumbnail_url}}" alt="Course Banner" class="w-full h-64 object-cover">
-             <div class="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded" id="course-badge" data-i18n="courses.popular">Popular</div>
          </div>
          <div class="p-6">
              <div class="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -43,7 +42,7 @@
                          </div>
                          <div class="flex items-center">
                              <i data-feather="users" class="h-4 w-4 mr-1"></i>
-                             <span id="course-students">1,456 students</span>
+                             <span id="course-students">{{course.enrollment.all.count}} students</span>
                          </div>
                      </div>
                      <div class="flex items-center">
@@ -54,9 +53,15 @@
                      </div>
                  </div>
                  <div class="mt-6 md:mt-0">
-                     <button class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium" onclick="showToast('Successfully enrolled in the course!')" data-i18n="course.enroll">
-                         Enroll Now
-                     </button>
+                    {% if enrollment %}
+                    <button class="w-full md:w-auto bg-gray-500 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium" disabled data-i18n="course.enroll">
+                        Enroll Now
+                    </button>
+                    {% else %}
+                    <button class="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium enroll-now" data-i18n="course.enroll">
+                        Enroll Now
+                    </button>
+                    {% endif %}
                  </div>
              </div>
          </div>
@@ -87,15 +92,27 @@
                  <div class="border border-gray-200 rounded-md mb-4 overflow-hidden">
                      <div class="module-content">
                         {% for lesson in course.lessons.all %}
-                         <a href="{% url 'lesson' course.title|slugify_filter lesson.id %}" class="lesson-item flex items-center justify-between px-4 py-3 border-t border-gray-200 hover:bg-blue-50">
-                             <div class="flex items-center">
-                                 <i data-feather="play-circle" class="h-5 w-5 text-blue-500 mr-2"></i>
-                                 <span class="text-gray-800">{{lesson.title}}</span>
-                             </div>
-                             <div class="flex items-center">
-                                 <span class="text-xs text-gray-600">{{lesson.get_duration_display}}</span>
-                             </div>
-                         </a>
+                        {% if enrollment %}
+                        <a href="{% url 'lesson' course.title|slugify_filter lesson.id %}" class="lesson-item flex items-center justify-between px-4 py-3 border-t border-gray-200 hover:bg-blue-50">
+                            <div class="flex items-center">
+                                <i data-feather="play-circle" class="h-5 w-5 text-blue-500 mr-2"></i>
+                                <span class="text-gray-800">{{lesson.title}}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-600">{{lesson.get_duration_display}}</span>
+                            </div>
+                        </a>
+                        {% else %}
+                        <a href="#" class="lesson-item flex items-center justify-between px-4 py-3 border-t border-gray-200 hover:bg-blue-50">
+                            <div class="flex items-center">
+                                <i data-feather="lock" class="h-5 w-5 text-blue-500 mr-2"></i>
+                                <span class="text-gray-800">{{lesson.title}}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-600">{{lesson.get_duration_display}}</span>
+                            </div>
+                        </a>
+                        {% endif %}
                          {% endfor %}
                      </div>
                  </div>
@@ -233,9 +250,15 @@
                  </ul>
 
                  <div class="mt-6 pt-6 border-t border-gray-200">
-                     <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium mb-3" onclick="showToast('Successfully enrolled in the course!')" data-i18n="course.enroll">
-                         Enroll Now
-                     </button>
+                    {% if enrollment %}
+                    <button class="w-full bg-gray-500 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium mb-3" disabled data-i18n="course.enroll">
+                        Enroll Now
+                    </button>
+                    {% else %}
+                    <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-md transition duration-300 ease-in-out font-medium mb-3 enroll-now" data-i18n="course.enroll">
+                        Enroll Now
+                    </button>
+                    {% endif %}
                  </div>
              </div>
              
@@ -276,7 +299,7 @@
     // Initialize Feather Icons
     document.addEventListener('DOMContentLoaded', function() {
         feather.replace();
-        
+
         // Initialize i18next
         i18next.init({
             lng: 'en',
@@ -322,10 +345,6 @@
                             certificate: "Certificate",
                             share: "Share This Course",
                             instructor: "Instructor"
-                        },
-                        courses: {
-                            popular: "Popular",
-                            new: "New"
                         }
                     }
                 },
@@ -369,10 +388,6 @@
                             certificate: "الشهادة",
                             share: "مشاركة هذه الدورة",
                             instructor: "المدرس"
-                        },
-                        courses: {
-                            popular: "شائع",
-                            new: "جديد"
                         }
                     }
                 }
@@ -380,7 +395,7 @@
         }, function(err, t) {
             updateContent();
         });
-        
+
         // Sidebar toggle functions
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -488,6 +503,7 @@
             }, 3000);
         };
         
+
         // Load course data
         // In a real application, this would be fetched from an API
         const courseData = {
@@ -509,13 +525,6 @@
             reviewForm.classList.toggle('open');
             if (reviewForm.classList.contains('open')) {
                 reviewForm.style.maxHeight = reviewForm.scrollHeight + 'px';
-                // Check if user has already submitted a review
-                const userReview = getUserReview();
-                if (userReview) {
-                    // Pre-fill the form with existing review
-                    document.querySelector(`input[name="rating"][value="${userReview.rating}"]`).checked = true;
-                    document.getElementById('review-text').value = userReview.text;
-                }
             } else {
                 reviewForm.style.maxHeight = '0';
             }
@@ -530,18 +539,40 @@
         });
         
         // Submit review
-        submitReviewForm.addEventListener('submit', function(e) {
+        submitReviewForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             // Get form data
             const rating = document.querySelector('input[name="rating"]:checked');
             const reviewText = document.getElementById('review-text').value;
-            
+            const courseId = '{{course.id}}'
+
             if (!rating || !reviewText.trim()) {
                 showToast('Please provide both a rating and review text');
                 return;
             }
-            
+
+            const response = await fetch("/courses/api/review/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie('csrftoken'),
+                },
+                body: JSON.stringify({
+                    course_id: courseId,
+                    rating: rating.value,
+                    comment: reviewText
+                }),
+            });
+            const reviewData = await response.json()
+            // Get the element by its ID
+            const userReview = document.getElementById('user-review-element');
+
+            // Check if the userReview exists
+            if (userReview) {
+                // Remove the userReview from the DOM
+                userReview.remove();
+            } 
             // Create or update review
             submitUserReview(parseInt(rating.value), reviewText.trim());
             
@@ -562,11 +593,8 @@
         likeButtons.forEach(button => {
             const reviewId = button.getAttribute('data-review-id');
             
-            // Check if user has already liked this review
-            if (hasUserLikedReview(reviewId)) {
-                button.classList.add('liked');
-                button.querySelector('i').classList.add('fill-current');
-            }
+                // button.classList.add('liked');
+                // button.querySelector('i').classList.add('fill-current');
             
             button.addEventListener('click', function() {
                 const likeCount = this.querySelector('.like-count');
@@ -577,26 +605,16 @@
                     this.classList.remove('liked');
                     this.querySelector('i').classList.remove('fill-current');
                     likeCount.textContent = currentLikes - 1;
-                    removeUserLike(reviewId);
                 } else {
                     // Like
                     this.classList.add('liked');
                     this.querySelector('i').classList.add('fill-current');
                     likeCount.textContent = currentLikes + 1;
-                    addUserLike(reviewId);
                 }
             });
         });
         
-        // Helper functions for user reviews and likes
-        function getUserReview() {
-            const userReviews = JSON.parse(localStorage.getItem('userReviews')) || {};
-            return userReviews[courseData.id];
-        }
-        
         function submitUserReview(rating, text) {
-            const userReviews = JSON.parse(localStorage.getItem('userReviews')) || {};
-            const isUpdate = !!userReviews[courseData.id];
             
             // Create review object
             const review = {
@@ -605,25 +623,13 @@
                 rating: rating,
                 text: text,
                 date: new Date().toISOString(),
-                userName: 'Ahmed Hassan', // Current user
-                userImage: 'https://via.placeholder.com/40'
+                userName: '{{request.user.username}}', // Current user
+                userImage: '{{request.user.userprofile.avatar_url}}'
             };
             
-            // Save to localStorage
-            userReviews[courseData.id] = review;
-            localStorage.setItem('userReviews', JSON.stringify(userReviews));
             
-            // Update UI
-            if (isUpdate) {
-                // Find and update existing review in the DOM
-                updateUserReviewInDOM(review);
-            } else {
-                // Add new review to the DOM
-                addUserReviewToDOM(review);
-            }
-            
-            // Update average rating and review count
-            updateReviewStats();
+            // Add new review to the DOM
+            addUserReviewToDOM(review);
         }
         
         function addUserReviewToDOM(review) {
@@ -691,56 +697,45 @@
             return stars;
         }
         
-        function updateReviewStats() {
-            const userReview = getUserReview();
-            if (!userReview) return;
-            
-            // For simplicity, we're just updating the average rating display
-            // In a real app, you would recalculate based on all reviews
-            const averageRating = document.getElementById('average-rating');
-            const reviewCount = document.getElementById('review-count');
-            
-            // Simple calculation for demo purposes
-            const currentRating = parseFloat(averageRating.textContent);
-            const currentCount = parseInt(reviewCount.textContent);
-            
-            if (document.getElementById('user-review-element')) {
-                // Update existing review - rating might have changed
-                const newAvg = ((currentRating * currentCount) - userReview.rating + parseInt(userReview.rating)) / currentCount;
-                averageRating.textContent = newAvg.toFixed(1);
-            } else {
-                // New review
-                const newCount = currentCount + 1;
-                const newAvg = ((currentRating * currentCount) + parseInt(userReview.rating)) / newCount;
-                
-                averageRating.textContent = newAvg.toFixed(1);
-                reviewCount.textContent = newCount;
-            }
-        }
-        
-        function hasUserLikedReview(reviewId) {
-            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
-            return userLikes[reviewId] === true;
-        }
-        
-        function addUserLike(reviewId) {
-            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
-            userLikes[reviewId] = true;
-            localStorage.setItem('userLikes', JSON.stringify(userLikes));
-        }
-        
-        function removeUserLike(reviewId) {
-            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
-            delete userLikes[reviewId];
-            localStorage.setItem('userLikes', JSON.stringify(userLikes));
-        }
-        
-        // Check if user has already submitted a review and display it
-        const existingReview = getUserReview();
-        if (existingReview) {
-            addUserReviewToDOM(existingReview);
-            updateReviewStats();
-        }
     });
 </script>
+
+
+<script>
+    document.querySelectorAll('.enroll-now').forEach(enrollNowBtn=>{
+        enrollNowBtn.addEventListener('click',async function (event) {
+            await enrollInCourse('{{course.id}}')
+            showToast('Successfully enrolled in the course!')
+            enrollNowBtn.disabled=true
+        });
+    })
+    async function enrollInCourse(courseId) {
+        try {
+            const response = await fetch(`/courses/api/enroll/${courseId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Required for session-based POST
+                },
+                credentials: 'include'  // Include cookies/session
+            });
+
+            // If Django redirects, manually handle it from `response.url`
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else if (response.ok) {
+                const data = await response.json();
+                alert(data.detail || "Enrolled successfully, but no lessons found.");
+            } else {
+                const errorData = await response.json();
+                alert(errorData.detail || "Something went wrong.");
+            }
+        } catch (err) {
+            console.error("Enrollment error:", err);
+            alert("An unexpected error occurred.");
+        }
+    }
+
+</script>
+
 {% endblock %}
