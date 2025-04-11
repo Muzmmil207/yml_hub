@@ -1,10 +1,13 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
+
 class RedirectParentToDashboardMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
         self.allowed_paths = [
+            reverse('profile'),
+            reverse('login'),
             reverse('logout'),
             reverse('parent-dashboard'),
         ]

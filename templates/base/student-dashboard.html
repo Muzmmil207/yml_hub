@@ -231,6 +231,11 @@
             <div class="dashboard-course-card bg-white rounded-lg shadow-sm overflow-hidden">
                 <div class="relative">
                     <img src="{{enrolled_course.course.thumbnail_url}}" alt="{{enrolled_course.course.title}}" class="w-full h-40 object-cover">
+                    {% if enrolled_course.completed %}
+                    <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 m-2 rounded">Completed</div>
+                    {% else %}
+                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-2 py-1 m-2 rounded">In Progress</div>
+                    {% endif %}
                 </div>
                 <div class="p-4">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">{{enrolled_course.course.title}}</h3>

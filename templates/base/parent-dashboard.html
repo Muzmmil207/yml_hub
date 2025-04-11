@@ -1,0 +1,224 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load slugify_tags %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+{% block content %}
+
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+    <!-- Welcome Section -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="parent.welcome">Welcome, {{request.user.username}}!</h2>
+                <p class="text-gray-600" data-i18n="parent.welcomeMessage">Monitor your children's learning progress and achievements.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Child's Section -->
+     {% for children in children_progress %}
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <img src="{{children.userprofile.avatar_url}}" alt="{{children.username}}" class="h-12 w-12 rounded-full mr-4">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800">{{children.username}}</h2>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Course -->
+            {% for enrollment in children.enrollment_set.all %}
+            <div class="dashboard-course-card bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="{{enrollment.course.thumbnail_url}}" alt="{{enrollment.course.title}}" class="w-full h-40 object-cover">
+                    {% if enrollment.completed %}
+                    <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 m-2 rounded">Completed</div>
+                    {% else %}
+                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-2 py-1 m-2 rounded">In Progress</div>
+                    {% endif %}
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{enrollment.course.title}}</h3>
+                    <div class="flex items-center text-sm text-gray-600 mb-3">
+                        <i data-feather="user" class="h-4 w-4 mr-1"></i>
+                        <span>@{{enrollment.course.instructor.username}}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize Feather Icons
+    document.addEventListener('DOMContentLoaded', function() {
+        feather.replace();
+        
+        // Initialize i18next
+        i18next.init({
+            lng: 'en',
+            debug: false,
+            resources: {
+                en: {
+                    translation: {
+                        brand: "YML Hub",
+                        language: "English",
+                        nav: {
+                            dashboard: "Dashboard",
+                            children: "My Children",
+                            courses: "Courses",
+                            messages: "Messages",
+                            parent: "Parent"
+                        },
+                        user: {
+                            profile: "Profile",
+                            settings: "Settings",
+                            logout: "Logout"
+                        },
+                        parent: {
+                            dashboard: "Parent Dashboard",
+                            welcome: "Welcome, {{request.user.username}}!",
+                            welcomeMessage: "Monitor your children's learning progress and achievements.",
+                            addChild: "Add Another Child",
+                            addChildDesc: "Monitor all your children's progress in one place",
+                            addChildButton: "Add Child"
+                        }
+                    }
+                },
+                ar: {
+                    translation: {
+                        brand: "مركز تعلم العقول الشابة",
+                        language: "العربية",
+                        nav: {
+                            dashboard: "لوحة التحكم",
+                            children: "أطفالي",
+                            courses: "الدورات",
+                            messages: "الرسائل",
+                            parent: "ولي الأمر"
+                        },
+                        user: {
+                            profile: "الملف الشخصي",
+                            settings: "الإعدادات",
+                            logout: "تسجيل الخروج"
+                        },
+                        parent: {
+                            dashboard: "لوحة تحكم ولي الأمر",
+                            welcome: "مرحبًا، {{request.user.username}}!",
+                            welcomeMessage: "راقب تقدم أطفالك في التعلم وإنجازاتهم.",
+                            addChild: "إضافة طفل آخر",
+                            addChildDesc: "راقب تقدم جميع أطفالك في مكان واحد",
+                            addChildButton: "إضافة طفل"
+                        }
+                    }
+                }
+            }
+        }, function(err, t) {
+            updateContent();
+        });
+        
+        // Sidebar toggle functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+        
+        // Make these functions globally available
+        window.toggleSidebar = toggleSidebar;
+        window.closeSidebar = closeSidebar;
+        
+        // Language Dropdown Toggle
+        const langToggle = document.getElementById('language-toggle');
+        const langDropdown = document.getElementById('language-dropdown');
+        
+        langToggle.addEventListener('click', function() {
+            langDropdown.classList.toggle('hidden');
+        });
+        
+        // User Dropdown Toggle
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdown = document.getElementById('user-dropdown');
+        
+        userMenuButton.addEventListener('click', function() {
+            userDropdown.classList.toggle('hidden');
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!langToggle.contains(event.target) && !langDropdown.contains(event.target)) {
+                langDropdown.classList.add('hidden');
+            }
+            
+            if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Language Selection
+        const langOptions = document.querySelectorAll('.lang-option');
+        const currentLang = document.getElementById('current-lang');
+        const htmlElement = document.documentElement;
+        
+        langOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                i18next.changeLanguage(lang, function() {
+                    updateContent();
+                    langDropdown.classList.add('hidden');
+                    
+                    // Update direction based on language
+                    if (lang === 'ar') {
+                        htmlElement.setAttribute('dir', 'rtl');
+                        document.body.classList.add('rtl');
+                        document.body.classList.remove('ltr');
+                    } else {
+                        htmlElement.setAttribute('dir', 'ltr');
+                        document.body.classList.add('ltr');
+                        document.body.classList.remove('rtl');
+                    }
+                });
+            });
+        });
+        
+        // Update content with translations
+        function updateContent() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = i18next.t(key);
+            });
+        }
+        
+        // Toast notification function
+        window.showToast = function(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+    });
+</script>
+{% endblock %}

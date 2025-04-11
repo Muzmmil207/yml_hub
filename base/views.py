@@ -196,9 +196,15 @@ def student_dashboard(request: HttpRequest):
 
 
 @login_required
-def parent_dashboard(request):
+def parent_dashboard(request: HttpRequest):
     if request.user.role != "parent":
         return redirect("landing")
+    # Get all children
+    links = StudentParentLink.objects.filter(parent=request.user).select_related(
+        "student"
+    )
+    children = [link.student for link in links]
 
-    context = {}
+
+    context = {"children_progress": children}
     return render(request, "base/parent-dashboard.html", context)
