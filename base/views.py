@@ -150,10 +150,48 @@ def course_view(request: HttpRequest, course_slug, course_id):
     return render(request, "base/course.html", context)
 
 
-@login_required
-def student_dashboard(request):
+DURATION_TO_HOURS = {
+    "5_min": 5 / 60,
+    "10_min": 10 / 60,
+    "15_min": 15 / 60,
+    "30_min": 30 / 60,
+    "45_min": 45 / 60,
+    "1_hour": 1,
+    "1.5_hours": 1.5,
+    "2_hours": 2,
+}
 
-    context = {}
+
+def get_total_badges_earned(completed_lessons_count):
+    badges = [
+        1,
+        5,
+        10,
+        25,
+        50,
+    ]
+
+    earned = [threshold for threshold in badges if completed_lessons_count >= threshold]
+    return len(earned)
+
+
+@login_required
+def student_dashboard(request: HttpRequest):
+    enrolled_courses = Enrollment.objects.filter(student=request.user)
+    progress = LessonProgress.objects.filter(
+        student=request.user, completed=True
+    ).select_related("lesson")
+    hours_spent = sum(DURATION_TO_HOURS.get(lp.lesson.duration, 0) for lp in progress)
+
+    completed_lessons = progress.count()
+
+    total_badges_earned = get_total_badges_earned(completed_lessons)
+    context = {
+        "enrolled_courses": enrolled_courses,
+        "completed_lessons": completed_lessons,
+        "hours_spent": round(hours_spent, 2),
+        "total_badges_earned": total_badges_earned,
+    }
     return render(request, "base/student-dashboard.html", context)
 
 

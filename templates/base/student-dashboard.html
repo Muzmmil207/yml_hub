@@ -1,0 +1,441 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load slugify_tags %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+{% block content %}
+
+<!-- Toast Notification -->
+<div id="toast" class="toast bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center">
+    <i data-feather="check-circle" class="h-5 w-5 mr-2"></i>
+    <span id="toast-message">Action completed successfully!</span>
+</div>
+
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-6">
+    <!-- Welcome Section -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="dashboard.welcome">Welcome back, {{request.user.username}}!</h2>
+                <p class="text-gray-600" data-i18n="dashboard.welcomeMessage">Continue your learning journey. You're making great progress!</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{% url 'courses' %}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-300 ease-in-out">
+                    <i data-feather="plus" class="h-4 w-4 mr-2"></i>
+                    <span data-i18n="dashboard.exploreCourses">Explore Courses</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <!-- Enrolled Courses -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                    <i data-feather="book-open" class="h-6 w-6"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600" data-i18n="dashboard.enrolledCourses">Enrolled Courses</p>
+                    <h3 class="text-xl font-bold text-gray-800">{{enrolled_courses.count}}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Completed Lessons -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                    <i data-feather="check-circle" class="h-6 w-6"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600" data-i18n="dashboard.completedLessons">Completed Lessons</p>
+                    <h3 class="text-xl font-bold text-gray-800">{{completed_lessons}}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hours Spent -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 text-purple-500 mr-4">
+                    <i data-feather="clock" class="h-6 w-6"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600" data-i18n="dashboard.hoursSpent">Hours Spent</p>
+                    <h3 class="text-xl font-bold text-gray-800"> {{ hours_spent }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Badges Earned -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4">
+                    <i data-feather="award" class="h-6 w-6"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-600" data-i18n="dashboard.badgesEarned">Badges Earned</p>
+                    <h3 class="text-xl font-bold text-gray-800">{{total_badges_earned}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Badges Section -->
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4" data-i18n="dashboard.achievements">Your Achievements</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- First Lesson Badge -->
+             {% if completed_lessons >= 1 %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-blue-50 border border-blue-100">
+                <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center mb-3">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">First Step</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Completed your first lesson</p>
+            </div>
+            {% else %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-60">
+                <div class="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center mb-3">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">First Step</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Complete your first lesson</p>
+                <div class="mt-2 w-full">
+                    <div class="text-xs text-center text-gray-600 mb-1">0 completed</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 5 Lessons Badge -->
+            {% if completed_lessons >= 5 %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-green-50 border border-green-100">
+                <div class="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center mb-3">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Fast Learner</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Completed 5 lessons</p>
+            </div>
+            {% else %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-60">
+                <div class="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center mb-3">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Fast Learner</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Complete 5 lessons</p>
+                <div class="mt-2 w-full">
+                    <div class="text-xs text-center text-gray-600 mb-1">{{completed_lessons}}/5 completed</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 10 Lessons Badge -->
+            {% if completed_lessons >= 10 %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-yellow-50 border border-yellow-100">
+                <div class="w-16 h-16 rounded-full bg-yellow-500 flex items-center justify-center mb-3">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Knowledge Seeker</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Completed 10 lessons</p>
+            </div>
+            {% else %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-60">
+                <div class="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center mb-3">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Knowledge Seeker</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Complete 10 lessons</p>
+                <div class="mt-2 w-full">
+                    <div class="text-xs text-center text-gray-600 mb-1">{{completed_lessons}}/10 completed</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            
+            <!-- 25 Lessons Badge -->
+            {% if completed_lessons >= 25 %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-orange-50 border border-orange-100">
+                <div class="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center mb-3 relative">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i data-feather="lock" class="h-6 w-6 text-white"></i>
+                    </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Master Student</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Completed 25 lessons</p>
+            </div>
+            {% else %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-60">
+                <div class="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center mb-3 relative">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i data-feather="lock" class="h-6 w-6 text-white"></i>
+                    </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Master Student</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Complete 25 lessons</p>
+                <div class="mt-2 w-full">
+                    <div class="text-xs text-center text-gray-600 mb-1">{{completed_lessons}}/25 completed</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            
+            <!-- 50 Lessons Badge -->
+            {% if completed_lessons >= 50 %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-purple-50 border border-purple-100">
+                <div class="w-16 h-16 rounded-full bg-purple-500 flex items-center justify-center mb-3 relative">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i data-feather="lock" class="h-6 w-6 text-white"></i>
+                    </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Learning Champion</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Completed 50 lessons</p>
+            </div>
+            {% else %}
+            <div class="badge-item flex flex-col items-center p-4 rounded-lg bg-gray-100 border border-gray-200 opacity-60">
+                <div class="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center mb-3 relative">
+                    <i data-feather="award" class="h-8 w-8 text-white"></i>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i data-feather="lock" class="h-6 w-6 text-white"></i>
+                    </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 text-center">Learning Champion</h3>
+                <p class="text-xs text-gray-600 text-center mt-1">Complete 50 lessons</p>
+                <div class="mt-2 w-full">
+                    <div class="text-xs text-center text-gray-600 mb-1">{{completed_lessons}}/50 completed</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <!-- My Courses Section -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-800" data-i18n="dashboard.myCourses">My Courses</h2>
+            <a href="{% url 'courses' %}" class="text-blue-500 hover:text-blue-700 text-sm font-medium flex items-center">
+                <span data-i18n="dashboard.viewAll">View All</span>
+                <i data-feather="chevron-right" class="h-4 w-4 ml-1"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Course  -->
+             {% for enrolled_course in enrolled_courses %}
+            <div class="dashboard-course-card bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="relative">
+                    <img src="{{enrolled_course.course.thumbnail_url}}" alt="{{enrolled_course.course.title}}" class="w-full h-40 object-cover">
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{enrolled_course.course.title}}</h3>
+                    <div class="flex items-center text-sm text-gray-600 mb-3">
+                        <i data-feather="user" class="h-4 w-4 mr-1"></i>
+                        <span>@{{enrolled_course.course.instructor.username}}</span>
+                    </div>
+                    <div class="flex items-center justify-end text-sm text-gray-600">
+                        <a href="{% url 'course' enrolled_course.course.title|slugify_filter enrolled_course.course.id %}" class="text-blue-500 hover:text-blue-700 font-medium">Continue</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+    
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+      // Initialize Feather Icons
+      document.addEventListener('DOMContentLoaded', function() {
+          feather.replace();
+          
+          // Initialize i18next
+          i18next.init({
+              lng: 'en',
+              debug: false,
+              resources: {
+                  en: {
+                      translation: {
+                          brand: "YML Hub",
+                          language: "English",
+                          nav: {
+                              dashboard: "Dashboard",
+                              courses: "My Courses",
+                              quizzes: "Quizzes & Assignments",
+                              progress: "Progress Tracking",
+                              reviews: "Reviews & Feedback",
+                              student: "Student"
+                          },
+                          user: {
+                              profile: "Profile",
+                              settings: "Settings",
+                              logout: "Logout"
+                          },
+                          dashboard: {
+                              title: "Dashboard",
+                              welcome: "Welcome back, {{request.user.username}}!",
+                              welcomeMessage: "Continue your learning journey. You're making great progress!",
+                              exploreCourses: "Explore Courses",
+                              enrolledCourses: "Enrolled Courses",
+                              completedLessons: "Completed Lessons",
+                              hoursSpent: "Hours Spent",
+                              badgesEarned: "Badges Earned",
+                              achievements: "Your Achievements",
+                              myCourses: "My Courses",
+                              viewAll: "View All"
+                          }
+                      }
+                  },
+                  ar: {
+                      translation: {
+                          brand: "مركز تعلم العقول الشابة",
+                          language: "العربية",
+                          nav: {
+                              dashboard: "لوحة التحكم",
+                              courses: "دوراتي",
+                              quizzes: "الاختبارات والواجبات",
+                              progress: "تتبع التقدم",
+                              reviews: "التقييمات والملاحظات",
+                              student: "طالب"
+                          },
+                          user: {
+                              profile: "الملف الشخصي",
+                              settings: "الإعدادات",
+                              logout: "تسجيل الخروج"
+                          },
+                          dashboard: {
+                              title: "لوحة التحكم",
+                              welcome: "مرحبًا بعودتك، {{request.user.username}}!",
+                              welcomeMessage: "واصل رحلة التعلم الخاصة بك. أنت تحرز تقدمًا رائعًا!",
+                              exploreCourses: "استكشاف الدورات",
+                              enrolledCourses: "الدورات المسجلة",
+                              completedLessons: "الدروس المكتملة",
+                              hoursSpent: "الساعات المستغرقة",
+                              badgesEarned: "الشارات المكتسبة",
+                              achievements: "إنجازاتك",
+                              myCourses: "دوراتي",
+                              viewAll: "عرض الكل"
+                          }
+                      }
+                  }
+              }
+          }, function(err, t) {
+              updateContent();
+          });
+          
+          // Sidebar toggle functions
+          function toggleSidebar() {
+              const sidebar = document.getElementById('sidebar');
+              const overlay = document.getElementById('sidebar-overlay');
+              sidebar.classList.toggle('open');
+              overlay.classList.toggle('active');
+          }
+          
+          function closeSidebar() {
+              const sidebar = document.getElementById('sidebar');
+              const overlay = document.getElementById('sidebar-overlay');
+              sidebar.classList.remove('open');
+              overlay.classList.remove('active');
+          }
+          
+          // Make these functions globally available
+          window.toggleSidebar = toggleSidebar;
+          window.closeSidebar = closeSidebar;
+          
+          // Language Dropdown Toggle
+          const langToggle = document.getElementById('language-toggle');
+          const langDropdown = document.getElementById('language-dropdown');
+          
+          langToggle.addEventListener('click', function() {
+              langDropdown.classList.toggle('hidden');
+          });
+          
+          // User Dropdown Toggle
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userDropdown = document.getElementById('user-dropdown');
+          
+          userMenuButton.addEventListener('click', function() {
+              userDropdown.classList.toggle('hidden');
+          });
+          
+          // Close dropdowns when clicking outside
+          document.addEventListener('click', function(event) {
+              if (!langToggle.contains(event.target) && !langDropdown.contains(event.target)) {
+                  langDropdown.classList.add('hidden');
+              }
+              
+              if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                  userDropdown.classList.add('hidden');
+              }
+          });
+          
+          // Language Selection
+          const langOptions = document.querySelectorAll('.lang-option');
+          const currentLang = document.getElementById('current-lang');
+          const htmlElement = document.documentElement;
+          
+          langOptions.forEach(option => {
+              option.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  const lang = this.getAttribute('data-lang');
+                  i18next.changeLanguage(lang, function() {
+                      updateContent();
+                      langDropdown.classList.add('hidden');
+                      
+                      // Update direction based on language
+                      if (lang === 'ar') {
+                          htmlElement.setAttribute('dir', 'rtl');
+                          document.body.classList.add('rtl');
+                          document.body.classList.remove('ltr');
+                      } else {
+                          htmlElement.setAttribute('dir', 'ltr');
+                          document.body.classList.add('ltr');
+                          document.body.classList.remove('rtl');
+                      }
+                  });
+              });
+          });
+          
+          // Update content with translations
+          function updateContent() {
+              const elements = document.querySelectorAll('[data-i18n]');
+              elements.forEach(element => {
+                  const key = element.getAttribute('data-i18n');
+                  element.textContent = i18next.t(key);
+              });
+          }
+          
+          // Toast notification function
+          window.showToast = function(message) {
+              const toast = document.getElementById('toast');
+              const toastMessage = document.getElementById('toast-message');
+              
+              toastMessage.textContent = message;
+              toast.classList.add('show');
+              
+              setTimeout(function() {
+                  toast.classList.remove('show');
+              }, 3000);
+          };
+          
+          // Badge hover effect
+          const badgeItems = document.querySelectorAll('.badge-item');
+          
+          badgeItems.forEach(badge => {
+              badge.addEventListener('mouseenter', function() {
+                  if (!this.classList.contains('opacity-60')) {
+                      showToast('Badge earned: ' + this.querySelector('h3').textContent);
+                  }
+              });
+          });
+      });
+  </script>
+{% endblock %}
